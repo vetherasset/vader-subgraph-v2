@@ -1,0 +1,303 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  # This approach uses a particular event emitted once very early to trigger token registry
+  # initialization. It is not so important what the event is but rather that it was emitted before
+  # any other event of an ERC20 token. We even don't know what contract it is. Besides that, the ABI
+  # file for that contract was inferred since no contract information or source code is available
+  # out there.
+
+  # ======================== Vader ========================
+  - kind: ethereum/contract
+    name: Vader
+    network: kovan
+    source:
+      address: "0x1E6F42f04D64D55ec08d6D4e6A7CB4a235E1c742"
+      abi: Vader
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: Vader
+          file: ./abis/Vader.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalEvent
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferEvent
+        - event: Emission(uint256,uint256)
+          handler: handleEmissionEvent
+        - event: EmissionChanged(uint256,uint256)
+          handler: handleEmissionChangedEvent
+        - event: GrantClaimed(indexed address,uint256)
+          handler: handleGrantClaimedEvent
+        - event: MaxSupplyChanged(uint256,uint256)
+          handler: handleMaxSupplyChangedEvent
+        - event: ProtocolInitialized(address,address,address,address)
+          handler: handleProtocolInitializedEvent
+      file: ./src/mappings/vader.ts
+
+  # ======================== USDV =========================
+  - kind: ethereum/contract
+    name: USDV
+    network: kovan
+    source:
+      address: "0x6b645db074f05775363d9b315c82cbb3A5337C50"
+      abi: USDV
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: USDV
+          file: ./abis/USDV.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalEvent
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferEvent
+      file: ./src/mappings/usdv.ts
+
+  # ====================== Converter ======================
+  - kind: ethereum/contract
+    name: Converter
+    network: kovan
+    source:
+      address: "0x8e7A48fC00cF9541392FB820628Ca730b6badf3e"
+      abi: Converter
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: Converter
+          file: ./abis/Converter.json
+      eventHandlers:
+        - event: Conversion(indexed address,uint256,uint256)
+          handler: handleConversionEvent
+      file: ./src/mappings/converter.ts
+
+  # ================== VaderPoolFactory ===================
+  - kind: ethereum/contract
+    name: VaderPoolFactory
+    network: kovan
+    source:
+      address: "0xa2b26Aa8fE7b5C0D1C9288c372F49f576bae4e4b"
+      abi: VaderPoolFactory
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: VaderPoolFactory
+          file: ./abis/VaderPoolFactory.json
+      eventHandlers:
+        - event: PoolCreated(address,address,address,uint256)
+          handler: handlePoolCreatedEvent
+      file: ./src/mappings/vaderPoolFactory.ts
+
+  # ==================== VaderReserve =====================
+  - kind: ethereum/contract
+    name: VaderReserve
+    network: kovan
+    source:
+      address: "0x3C5d480d3a0CC4e62f557e2A2c546aE9110CB987"
+      abi: VaderReserve
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: VaderReserve
+          file: ./abis/VaderReserve.json
+      eventHandlers:
+        - event: GrantDistributed(address,uint256)
+          handler: handleGrantDistributedEvent
+        - event: LossCovered(address,uint256)
+          handler: handleLossCoveredEvent
+      file: ./src/mappings/vaderReserve.ts
+
+  # ==================== LinearVesting ====================
+  - kind: ethereum/contract
+    name: LinearVesting
+    network: kovan
+    source:
+      address: "0x0031e708132089B3ed866495d5838273ea27B0ee"
+      abi: LinearVesting
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: LinearVesting
+          file: ./abis/LinearVesting.json
+      eventHandlers:
+        - event: Vested(indexed address,uint256)
+          handler: handleVestedEvent
+        - event: VestingInitialized(uint256)
+          handler: handleVestingInitializedEvent
+      file: ./src/mappings/linearVesting.ts
+
+  # ==================== GovernorAlpha ====================
+  - kind: ethereum/contract
+    name: GovernorAlpha
+    network: kovan
+    source:
+      address: "0x0031e708132089B3ed866495d5838273ea27B0ee"
+      abi: GovernorAlpha
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: GovernorAlpha
+          file: ./abis/GovernorAlpha.json
+      eventHandlers:
+        - event: CouncilChanged(address,address)
+          handler: handleCouncilChangedEvent
+        - event: FeeReceiverChanged(address,address)
+          handler: handleFeeReceiverChangedEvent
+        - event: FeeAmountChanged(uint256,uint256)
+          handler: handleFeeAmountChangedEvent
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreatedEvent
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceledEvent
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueuedEvent
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecutedEvent
+        - event: ProposalVetoed(uint256,bool)
+          handler: handleProposalVetoedEvent
+        - event: VoteCast(address,uint256,bool,uint256)
+          handler: handleVoteCastEvent
+      file: ./src/mappings/governorAlpha.ts
+
+    # ====================== Timelock =======================
+  - kind: ethereum/contract
+    name: Timelock
+    network: kovan
+    source:
+      address: "0x0031e708132089B3ed866495d5838273ea27B0ee"
+      abi: Timelock
+      startBlock: 27787093
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: Timelock
+          file: ./abis/Timelock.json
+      eventHandlers:
+        - event: NewAdmin(indexed address)
+          handler: NewAdminEvent
+        - event: NewPendingAdmin(indexed address)
+          handler: NewPendingAdminEvent
+        - event: NewDelay(indexed uint256)
+          handler: NewDelayEvent
+        - event: CancelTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
+          handler: CancelTransactionEvent
+        - event: ExecuteTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
+          handler: ExecuteTransactionEvent
+        - event: QueueTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
+          handler: QueueTransactionEvent
+      file: ./src/mappings/timelock.ts
+
+templates:
+  # ====================== VaderPool ======================
+  - kind: ethereum/contract
+    name: VaderPool
+    network: kovan
+    source:
+      abi: VaderPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: VaderPool
+          file: ./abis/VaderPool.json
+      eventHandlers:
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurnEvent
+        - event: Mint(indexed address,indexed address,uint256,uint256)
+          handler: handleMintEvent
+        - event: PositionOpened(indexed address,uint256,uint256)
+          handler: handlePositionOpenedEvent
+        - event: PositionClosed(indexed address,uint256,uint256,uint256)
+          handler: handlePositionClosedEvent
+        - event: QueueActive(bool)
+          handler: handleQueueActiveEvent
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwapEvent
+        - event: Sync(uint256,uint256)
+          handler: handleSyncEvent
+      file: ./src/mappings/vaderPool.ts

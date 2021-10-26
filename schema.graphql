@@ -1,0 +1,404 @@
+enum ProposalState {
+  Pending
+  Active
+  Canceled
+  Defeated
+  Succeeded
+  Queued
+  Expired
+  Executed
+}
+
+type Global @entity {
+  id: ID!
+  name: String!
+  value: String!
+}
+
+type Allowance @entity {
+  id: ID!
+  token: Token!
+  owner: Account!
+  spender: Account!
+  amount: BigInt!
+}
+
+type Balance @entity {
+  id: ID!
+  account: Account!
+  token: Token!
+  balance: BigInt!
+}
+
+type Account @entity {
+  id: ID!
+  address: Bytes!
+  isUntaxed: Boolean!
+  token: [Balance]! @derivedFrom(field: "account")
+  allowance: [Allowance]! @derivedFrom(field: "owner")
+  vest: [Vest]! @derivedFrom(field: "account")
+  burnSenderEvent: [BurnEvent]! @derivedFrom(field: "sender")
+  burnToEvent: [BurnEvent]! @derivedFrom(field: "to")
+  mintSenderEvent: [MintEvent]! @derivedFrom(field: "sender")
+  mintToEvent: [MintEvent]! @derivedFrom(field: "to")
+  proposal: [Proposal]! @derivedFrom(field: "proposer")
+  conversionEvent: [ConversionEvent]! @derivedFrom(field: "user")
+  councilChangedOldEvent: [CouncilChangedEvent]! @derivedFrom(field: "oldCouncil")
+  councilChangedNewEvent: [CouncilChangedEvent]! @derivedFrom(field: "newCouncil")
+  feeReceiverChangedOldEvent: [FeeReceiverChangedEvent]! @derivedFrom(field: "oldFeeReceiver")
+  feeReceiverChangedNewEvent: [FeeReceiverChangedEvent]! @derivedFrom(field: "newFeeReceiver")
+  grantClaimedEvent: [GrantClaimedEvent]! @derivedFrom(field: "beneficiary")
+  grantDistributedEvent: [GrantDistributedEvent]! @derivedFrom(field: "recipient")
+  lossCoveredEvent: [LossCoveredEvent]! @derivedFrom(field: "recipient")
+  newAdminEvent: [NewAdminEvent]! @derivedFrom(field: "newAdmin")
+  newPendingAdminEvent: [NewPendingAdminEvent]! @derivedFrom(field: "newPendingAdmin")
+  positionOpenedEvent: [PositionOpenedEvent]! @derivedFrom(field: "sender")
+  positionClosedEvent: [PositionClosedEvent]! @derivedFrom(field: "sender")
+  proposalCreatedEvent: [ProposalCreatedEvent]! @derivedFrom(field: "proposer")
+  receipt: [Receipt]! @derivedFrom(field: "voter")
+  approveOwnerEvent: [ApprovalEvent]! @derivedFrom(field: "owner")
+  approveSpenderEvent: [ApprovalEvent]! @derivedFrom(field: "spender")
+  receiveEvent: [TransferEvent]! @derivedFrom(field: "to")
+  sendEvent: [TransferEvent]! @derivedFrom(field: "from")
+  swapSenderEvent: [SwapEvent]! @derivedFrom(field: "sender")
+  swapToEvent: [SwapEvent]! @derivedFrom(field: "to")
+  vestedEvent: [VestedEvent]! @derivedFrom(field: "from")
+}
+
+# ======================== Token ========================
+type Token @entity {
+  id: ID!
+  address: Bytes!
+  totalSupply: BigInt!
+  holder: [Balance]! @derivedFrom(field: "token")
+  allowance: [Allowance]! @derivedFrom(field: "token")
+  nativeAssetPool: [Pool]! @derivedFrom(field: "nativeAsset")
+  foreignAssetPool: [Pool]! @derivedFrom(field: "foreignAsset")
+  transferEvent: [TransferEvent]! @derivedFrom(field: "token")
+  approvalEvent: [ApprovalEvent]! @derivedFrom(field: "token")
+  poolCreatedToken0Event: [PoolCreatedEvent]! @derivedFrom(field: "token0")
+  poolCreatedToken1Event: [PoolCreatedEvent]! @derivedFrom(field: "token1")
+}
+
+type ApprovalEvent @entity {
+  id: ID!
+  token: Token!
+  owner: Account!
+  spender: Account!
+  amount: BigInt!
+}
+
+type TransferEvent @entity {
+  id: ID!
+  token: Token!
+  from: Account!
+  to: Account!
+  value: BigInt!
+}
+
+# ======================== Vader ========================
+type EmissionEvent @entity {
+  id: ID!
+  amount: BigInt!
+  lastEmission: BigInt!
+}
+
+type EmissionChangedEvent @entity {
+  id: ID!
+  previous: BigInt!
+  next: BigInt!
+}
+
+type GrantClaimedEvent @entity {
+  id: ID!
+  beneficiary: Account!
+  amount: BigInt!
+}
+
+type MaxSupplyChangedEvent @entity {
+  id: ID!
+  previous: BigInt!
+  next: BigInt!
+}
+
+type ProtocolInitializedEvent @entity {
+  id: ID!
+  converter: Bytes!
+  vest: Token!
+  usdv: Token!
+  dao: Bytes!
+}
+
+# ======================== USDV =========================
+
+# ====================== Converter ======================
+type ConversionEvent @entity {
+  id: ID!
+  user: Account!
+  vetherAmount: BigInt!
+  vaderAmount: BigInt!
+}
+
+# ================== VaderPoolFactory ====================
+type PoolCreatedEvent @entity {
+  id: ID!
+  token0: Token!
+  token1: Token!
+  pool: Bytes!
+  totalPools: BigInt!
+}
+
+# ==================== VaderReserve ======================
+type GrantDistributedEvent @entity {
+  id: ID!
+  recipient: Account!
+  amount: BigInt!
+}
+
+type LossCoveredEvent @entity {
+  id: ID!
+  recipient: Account!
+  amount: BigInt!
+}
+
+# =================== LinearVesting ======================
+type Vest @entity {
+  id: ID!
+  account: Account!
+  amount: BigInt!
+  lastClaim: BigInt!
+}
+
+type VestedEvent @entity {
+  id: ID!
+  from: Account!
+  amount: BigInt!
+}
+
+type VestingInitializedEvent @entity {
+  id: ID!
+  duration: BigInt!
+}
+
+# =================== GovernorAlpha ======================
+type Proposal @entity {
+  id: ID!
+  canceled: Boolean!
+  executed: Boolean!
+  proposer: Account!
+  eta: BigInt!
+  targets: [Bytes!]!
+  values: [BigInt!]!
+  signatures: [String]!
+  calldatas: [Bytes!]!
+  startBlock: BigInt!
+  endBlock: BigInt!
+  forVotes: BigInt!
+  againstVotes: BigInt!
+  vetoStatus: VetoStatus
+  receipt: [Receipt]! @derivedFrom(field: "proposal")
+}
+
+type VetoStatus @entity {
+  id: ID!
+  hasBeenVetoed: Boolean!
+  support: Boolean!
+}
+
+type Receipt @entity {
+  id: ID!
+  proposal: Proposal!
+  voter: Account!
+  hasVoted: Boolean!
+  support: Boolean!
+  votes: BigInt!
+}
+
+type CouncilChangedEvent @entity {
+  id: ID!
+  oldCouncil: Account!
+  newCouncil: Account!
+}
+
+type FeeReceiverChangedEvent @entity {
+  id: ID!
+  oldFeeReceiver: Account!
+  newFeeReceiver: Account!
+}
+
+type FeeAmountChangedEvent @entity {
+  id: ID!
+  oldFeeAmount: BigInt!
+  newFeeAmount: BigInt!
+}
+
+type ProposalCreatedEvent @entity {
+  id: ID!
+  index: BigInt!
+  proposer: Account!
+  targets: [Bytes!]!
+  values: [BigInt!]!
+  signatures: [String]!
+  calldatas: [Bytes!]!
+  startBlock: BigInt!
+  endBlock: BigInt!
+  description: String!
+}
+
+type ProposalCanceledEvent @entity {
+  id: ID!
+  proposalId: BigInt!
+}
+
+type ProposalQueuedEvent @entity {
+  id: ID!
+  proposalId: BigInt!
+  eta: BigInt!
+}
+
+type ProposalExecutedEvent @entity {
+  id: ID!
+  proposalId: BigInt!
+}
+
+type ProposalVetoedEvent @entity {
+  id: ID!
+  proposalId: BigInt!
+  support: Boolean!
+}
+
+type VoteCastEvent @entity {
+  id: ID!
+  voter: Account!
+  proposalId: BigInt!
+  support: Boolean!
+  votes: BigInt!
+}
+                        
+# ===================== Timelock =========================
+type QueuedTransaction @entity {
+  id: ID!
+  status: Boolean!
+  cancelTransactionEvent: [CancelTransactionEvent]! @derivedFrom(field: "txHash")
+  executeTransactionEvent: [ExecuteTransactionEvent]! @derivedFrom(field: "txHash")
+  queueTransactionEvent: [QueueTransactionEvent]! @derivedFrom(field: "txHash")
+}
+
+type NewAdminEvent @entity {
+  id: ID!
+  newAdmin: Account!
+}
+
+type NewPendingAdminEvent @entity {
+  id: ID!
+  newPendingAdmin: Account!
+}
+
+type NewDelayEvent @entity {
+  id: ID!
+  newDelay: BigInt!
+}
+
+type CancelTransactionEvent @entity {
+  id: ID!
+  txHash: QueuedTransaction!
+  target: Bytes!
+  value: BigInt!
+  signature: String!
+  data: Bytes!
+  eta: BigInt!
+}
+
+type ExecuteTransactionEvent @entity {
+  id: ID!
+  txHash: QueuedTransaction!
+  target: Bytes!
+  value: BigInt!
+  signature: String!
+  data: Bytes!
+  eta: BigInt!
+}
+
+type QueueTransactionEvent @entity {
+  id: ID!
+  txHash: QueuedTransaction!
+  target: Bytes!
+  value: BigInt!
+  signature: String!
+  data: Bytes!
+  eta: BigInt!
+}
+
+# ===================== VaderPool ========================
+type Pool @entity {
+  id: ID!
+  address: Bytes!
+  nativeAsset: Token!
+  foreignAsset: Token!
+  reserveNative: BigInt!
+  reserveForeign: BigInt!
+  blockTimestampLast: BigInt!
+  queueActive: Boolean!
+}
+
+type Position @entity {
+  id: ID!
+  pool: Pool!
+  index: BigInt!
+  creation: BigInt!
+  liquidity: BigInt!
+  originalNative: BigInt!
+  originalForeign: BigInt!
+}
+
+type BurnEvent @entity {
+  id: ID!
+  sender: Account!
+  amount0: BigInt!
+  amount1: BigInt!
+  to: Account!
+}
+
+type MintEvent @entity {
+  id: ID!
+  sender: Account!
+  to: Account!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type PositionOpenedEvent @entity {
+  id: ID!
+  sender: Account!
+  index: BigInt!
+  liquidity: BigInt!
+}
+
+type PositionClosedEvent @entity {
+  id: ID!
+  sender: Account!
+  index: BigInt!
+  liquidity: BigInt!
+  loss: BigInt!
+}
+
+type QueueActiveEvent @entity {
+  id: ID!
+  activated: Boolean!
+}
+
+type SwapEvent @entity {
+  id: ID!
+  sender: Account!
+  amount0In: BigInt!
+  amount1In: BigInt!
+  amount0Out: BigInt!
+  amount1Out: BigInt!
+  to: Account!
+}
+
+type SyncEvent @entity {
+  id: ID!
+  reserve0: BigInt!
+  reserve1: BigInt!
+}

@@ -1,0 +1,18 @@
+{
+  "name": "erc20-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "auth": "graph auth https://api.thegraph.com/deploy/",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ satoshi-naoki/vader-protocol",
+    "create-local": "graph create --node http://localhost:8020/ satoshi-naoki/vader-protocol",
+    "remove-local": "graph remove --node http://localhost:8020/ satoshi-naoki/vader-protocol",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 satoshi-naoki/vader-protocol"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.20.0",
+    "@graphprotocol/graph-ts": "0.20.0"
+  }
+}
