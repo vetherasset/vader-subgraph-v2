@@ -30,172 +30,6 @@
         "type": "event"
     },
     {
-        "inputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "tokenA",
-                "type": "address"
-            },
-            {
-                "internalType": "contract IERC20",
-                "name": "tokenB",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountADesired",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountBDesired",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "deadline",
-                "type": "uint256"
-            }
-        ],
-        "name": "addLiquidity",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountA",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountB",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "liquidity",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "tokenA",
-                "type": "address"
-            },
-            {
-                "internalType": "contract IERC20",
-                "name": "tokenB",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountADesired",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountBDesired",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "deadline",
-                "type": "uint256"
-            }
-        ],
-        "name": "addLiquidity",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountA",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountB",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "liquidity",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountOut",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address[]",
-                "name": "path",
-                "type": "address[]"
-            }
-        ],
-        "name": "calculateInGivenOut",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address[]",
-                "name": "path",
-                "type": "address[]"
-            }
-        ],
-        "name": "calculateOutGivenIn",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountOut",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "factory",
         "outputs": [
@@ -209,19 +43,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "contract IVaderReserve",
-                "name": "_reserve",
-                "type": "address"
-            }
-        ],
-        "name": "initialize",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "owner",
         "outputs": [
@@ -232,6 +53,157 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "reserve",
+        "outputs": [
+            {
+                "internalType": "contract IVaderReserve",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "tokenA",
+                "type": "address"
+            },
+            {
+                "internalType": "contract IERC20",
+                "name": "tokenB",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountADesired",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountBDesired",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "deadline",
+                "type": "uint256"
+            }
+        ],
+        "name": "addLiquidity",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountA",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountB",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "liquidity",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "tokenA",
+                "type": "address"
+            },
+            {
+                "internalType": "contract IERC20",
+                "name": "tokenB",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountADesired",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountBDesired",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "deadline",
+                "type": "uint256"
+            }
+        ],
+        "name": "addLiquidity",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountA",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountB",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "liquidity",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -286,26 +258,6 @@
             }
         ],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "reserve",
-        "outputs": [
-            {
-                "internalType": "contract IVaderReserve",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -389,14 +341,62 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "newOwner",
+                "internalType": "contract IVaderReserve",
+                "name": "_reserve",
                 "type": "address"
             }
         ],
-        "name": "transferOwnership",
+        "name": "initialize",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address[]",
+                "name": "path",
+                "type": "address[]"
+            }
+        ],
+        "name": "calculateInGivenOut",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address[]",
+                "name": "path",
+                "type": "address[]"
+            }
+        ],
+        "name": "calculateOutGivenIn",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     }
 ]

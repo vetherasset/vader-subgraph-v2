@@ -13,9 +13,9 @@ dataSources:
     name: Vader
     network: kovan
     source:
-      address: "0x1E6F42f04D64D55ec08d6D4e6A7CB4a235E1c742"
+      address: "0xE8bD273f54a990007b1069a15b66B584abc86e04"
       abi: Vader
-      startBlock: 27787093
+      startBlock: 27956678
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -52,9 +52,9 @@ dataSources:
     name: USDV
     network: kovan
     source:
-      address: "0x6b645db074f05775363d9b315c82cbb3A5337C50"
+      address: "0xE90E0A75694Fc97576868243AD0364d10291f48A"
       abi: USDV
-      startBlock: 27787093
+      startBlock: 27959344
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -81,9 +81,9 @@ dataSources:
     name: Converter
     network: kovan
     source:
-      address: "0x8e7A48fC00cF9541392FB820628Ca730b6badf3e"
+      address: "0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5"
       abi: Converter
-      startBlock: 27787093
+      startBlock: 27956747
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -103,41 +103,14 @@ dataSources:
           handler: handleConversionEvent
       file: ./src/mappings/converter.ts
 
-  # ================== VaderPoolFactory ===================
-  - kind: ethereum/contract
-    name: VaderPoolFactory
-    network: kovan
-    source:
-      address: "0xa2b26Aa8fE7b5C0D1C9288c372F49f576bae4e4b"
-      abi: VaderPoolFactory
-      startBlock: 27787093
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Global
-        - Token
-        - Account
-        - Allowance
-        - Transaction
-        - ApprovalEvent
-      abis:
-        - name: VaderPoolFactory
-          file: ./abis/VaderPoolFactory.json
-      eventHandlers:
-        - event: PoolCreated(address,address,address,uint256)
-          handler: handlePoolCreatedEvent
-      file: ./src/mappings/vaderPoolFactory.ts
-
   # ==================== VaderReserve =====================
   - kind: ethereum/contract
     name: VaderReserve
     network: kovan
     source:
-      address: "0x3C5d480d3a0CC4e62f557e2A2c546aE9110CB987"
+      address: "0x176207eD5Ae8c41F766E8C31112c7cDdE5Fb32AA"
       abi: VaderReserve
-      startBlock: 27787093
+      startBlock: 27959289
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -164,9 +137,9 @@ dataSources:
     name: LinearVesting
     network: kovan
     source:
-      address: "0x0031e708132089B3ed866495d5838273ea27B0ee"
+      address: "0xEa66FB7590147A5C901E14034f243e1cF8f958ff"
       abi: LinearVesting
-      startBlock: 27787093
+      startBlock: 27956766
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -193,9 +166,9 @@ dataSources:
     name: GovernorAlpha
     network: kovan
     source:
-      address: "0x0031e708132089B3ed866495d5838273ea27B0ee"
+      address: "0x34e9Db9bC8c668E2fa922c1d22913DCd587607D8"
       abi: GovernorAlpha
-      startBlock: 27787093
+      startBlock: 27959549
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -236,9 +209,9 @@ dataSources:
     name: Timelock
     network: kovan
     source:
-      address: "0x0031e708132089B3ed866495d5838273ea27B0ee"
+      address: "0x7574D631E9b402917cC478ac568b465D7F726033"
       abi: Timelock
-      startBlock: 27787093
+      startBlock: 27959607
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -255,17 +228,17 @@ dataSources:
           file: ./abis/Timelock.json
       eventHandlers:
         - event: NewAdmin(indexed address)
-          handler: NewAdminEvent
+          handler: handleNewAdminEvent
         - event: NewPendingAdmin(indexed address)
-          handler: NewPendingAdminEvent
+          handler: handleNewPendingAdminEvent
         - event: NewDelay(indexed uint256)
-          handler: NewDelayEvent
+          handler: handleNewDelayEvent
         - event: CancelTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
-          handler: CancelTransactionEvent
+          handler: handleCancelTransactionEvent
         - event: ExecuteTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
-          handler: ExecuteTransactionEvent
+          handler: handleExecuteTransactionEvent
         - event: QueueTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
-          handler: QueueTransactionEvent
+          handler: handleQueueTransactionEvent
       file: ./src/mappings/timelock.ts
 
 templates:

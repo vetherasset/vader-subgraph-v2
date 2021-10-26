@@ -76,8 +76,6 @@ type Token @entity {
   foreignAssetPool: [Pool]! @derivedFrom(field: "foreignAsset")
   transferEvent: [TransferEvent]! @derivedFrom(field: "token")
   approvalEvent: [ApprovalEvent]! @derivedFrom(field: "token")
-  poolCreatedToken0Event: [PoolCreatedEvent]! @derivedFrom(field: "token0")
-  poolCreatedToken1Event: [PoolCreatedEvent]! @derivedFrom(field: "token1")
 }
 
 type ApprovalEvent @entity {
@@ -137,15 +135,6 @@ type ConversionEvent @entity {
   user: Account!
   vetherAmount: BigInt!
   vaderAmount: BigInt!
-}
-
-# ================== VaderPoolFactory ====================
-type PoolCreatedEvent @entity {
-  id: ID!
-  token0: Token!
-  token1: Token!
-  pool: Bytes!
-  totalPools: BigInt!
 }
 
 # ==================== VaderReserve ======================
