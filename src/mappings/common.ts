@@ -7,7 +7,7 @@ import {
   Global,
   Account,
   Token,
-  Pool,
+  PairInfo,
   Position,
   Proposal,
   Receipt,
@@ -39,6 +39,8 @@ export let VESTING_DURATION = BigInt.fromI32(2).times(ONE_YEAR);
 export let MAX_BASIS_POINTS = BigInt.fromI32(100_00);
 export let MAX_FEE_BASIS_POINTS = BigInt.fromI32(1_00);
 export let BURN = "0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD";
+export let UINT32_MAX = BigInt.fromI32(2).pow(32);
+export let UINT112_MAX = BigInt.fromI32(2).pow(112);
 
 export function initConstants(): void {
   createOrUpdateGlobal('INITIAL_VADER_SUPPLY', INITIAL_VADER_SUPPLY.toString());
@@ -104,6 +106,7 @@ export function getOrCreateToken(
     token = new Token(_address);
     token.address = Address.fromString(_address);
     token.totalSupply = ZERO;
+    token.isSupported = false;
     token.save();
   }
 
@@ -188,42 +191,41 @@ export function getOrCreateQueuedTransaction(
   return queuedTransaction as QueuedTransaction;
 }
 
-export function getOrCreatePool(
-  _address: string,
-  _token0: string = '',
-  _token1: string = ''
-): Pool {
-  let poolId = _address;
-  let pool = Pool.load(poolId);
+export function getOrCreatePairInfo(
+  _address: string
+): PairInfo {
+  let pairInfo = PairInfo.load(_address);
+  let token = getOrCreateToken(_address);
 
-  if (!pool) {
-    pool = new Pool(poolId);
-    pool.address = Address.fromString(_address);
-    pool.nativeAsset = _token0;
-    pool.foreignAsset = _token1;
-    pool.blockTimestampLast = ZERO;
-    pool.queueActive = false;
-    pool.save();
+  if (!pairInfo) {
+    pairInfo = new PairInfo(_address);
+    pairInfo.foreignAsset = token.id;
+    pairInfo.totalSupply = ZERO;
+    pairInfo.reserveNative = ZERO;
+    pairInfo.reserveForeign = ZERO;
+    pairInfo.blockTimestampLast = ZERO;
+    pairInfo.nativeLast = ZERO;
+    pairInfo.foreignLast = ZERO;
+    pairInfo.save();
   }
 
-  return pool as Pool;
+  return pairInfo as PairInfo;
 }
 
 export function getOrCreatePosition(
-  _pool: string,
   _id: BigInt
 ): Position {
-  let positionId = _pool + '_' + _id.toString();
+  let positionId = _id.toString();
   let position = Position.load(positionId);
 
   if (!position) {
     position = new Position(positionId);
-    position.pool = _pool;
-    position.index = _id;
+    position.foreignAsset = ZERO_ADDRESS;
     position.creation = ZERO;
     position.liquidity = ZERO;
     position.originalNative = ZERO;
     position.originalForeign = ZERO;
+    position.isDeleted = false;
     position.save();
   }
 

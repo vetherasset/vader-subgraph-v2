@@ -132,6 +132,48 @@ dataSources:
           handler: handleLossCoveredEvent
       file: ./src/mappings/vaderReserve.ts
 
+  # ===================== VaderPoolV2 ======================
+  - kind: ethereum/contract
+    name: VaderPoolV2
+    network: kovan
+    source:
+      address: "0x795bE6b0BF54AF587385604B9DB869E797db69E0"
+      abi: VaderPoolV2
+      startBlock: 27959008
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: VaderPoolV2
+          file: ./abis/VaderPoolV2.json
+      eventHandlers:
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurnEvent
+        - event: Mint(indexed address,indexed address,uint256,uint256)
+          handler: handleMintEvent
+        - event: PositionOpened(indexed address,indexed address,uint256,uint256)
+          handler: handlePositionOpenedEvent
+        - event: PositionClosed(indexed address,uint256,uint256,uint256)
+          handler: handlePositionClosedEvent
+        - event: QueueActive(bool)
+          handler: handleQueueActiveEvent
+        - event: Swap(address,indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwapEvent
+        - event: Sync(address,uint256,uint256)
+          handler: handleSyncEvent
+      callHandlers:
+        - function: burn(uint256,address)
+          handler: handleBurn
+        - function: mint(address,uint256,uint256,address,address)
+          handler: handleMint
+        - function: setTokenSupport(address,bool)
+          handler: handleSetTokenSupport
+      file: ./src/mappings/vaderPoolV2.ts
+
   # ==================== LinearVesting ====================
   - kind: ethereum/contract
     name: LinearVesting
@@ -240,37 +282,3 @@ dataSources:
         - event: QueueTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
           handler: handleQueueTransactionEvent
       file: ./src/mappings/timelock.ts
-
-templates:
-  # ====================== VaderPool ======================
-  - kind: ethereum/contract
-    name: VaderPool
-    network: kovan
-    source:
-      abi: VaderPool
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Pair
-        - Token
-      abis:
-        - name: VaderPool
-          file: ./abis/VaderPool.json
-      eventHandlers:
-        - event: Burn(indexed address,uint256,uint256,indexed address)
-          handler: handleBurnEvent
-        - event: Mint(indexed address,indexed address,uint256,uint256)
-          handler: handleMintEvent
-        - event: PositionOpened(indexed address,uint256,uint256)
-          handler: handlePositionOpenedEvent
-        - event: PositionClosed(indexed address,uint256,uint256,uint256)
-          handler: handlePositionClosedEvent
-        - event: QueueActive(bool)
-          handler: handleQueueActiveEvent
-        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
-          handler: handleSwapEvent
-        - event: Sync(uint256,uint256)
-          handler: handleSyncEvent
-      file: ./src/mappings/vaderPool.ts

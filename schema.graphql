@@ -52,7 +52,8 @@ type Account @entity {
   lossCoveredEvent: [LossCoveredEvent]! @derivedFrom(field: "recipient")
   newAdminEvent: [NewAdminEvent]! @derivedFrom(field: "newAdmin")
   newPendingAdminEvent: [NewPendingAdminEvent]! @derivedFrom(field: "newPendingAdmin")
-  positionOpenedEvent: [PositionOpenedEvent]! @derivedFrom(field: "sender")
+  positionOpenedFromEvent: [PositionOpenedEvent]! @derivedFrom(field: "from")
+  positionOpenedToEvent: [PositionOpenedEvent]! @derivedFrom(field: "to")
   positionClosedEvent: [PositionClosedEvent]! @derivedFrom(field: "sender")
   proposalCreatedEvent: [ProposalCreatedEvent]! @derivedFrom(field: "proposer")
   receipt: [Receipt]! @derivedFrom(field: "voter")
@@ -70,10 +71,13 @@ type Token @entity {
   id: ID!
   address: Bytes!
   totalSupply: BigInt!
+  isSupported: Boolean!
   holder: [Balance]! @derivedFrom(field: "token")
   allowance: [Allowance]! @derivedFrom(field: "token")
-  nativeAssetPool: [Pool]! @derivedFrom(field: "nativeAsset")
-  foreignAssetPool: [Pool]! @derivedFrom(field: "foreignAsset")
+  position: [Position]! @derivedFrom(field: "foreignAsset")
+  pairInfo: [PairInfo]! @derivedFrom(field: "foreignAsset")
+  swapEvent: [SwapEvent]! @derivedFrom(field: "foreignAsset")
+  syncEvent: [SyncEvent]! @derivedFrom(field: "foreignAsset")
   transferEvent: [TransferEvent]! @derivedFrom(field: "token")
   approvalEvent: [ApprovalEvent]! @derivedFrom(field: "token")
 }
@@ -148,6 +152,83 @@ type LossCoveredEvent @entity {
   id: ID!
   recipient: Account!
   amount: BigInt!
+}
+
+# ===================== VaderPoolV2 ========================
+type Position @entity {
+  id: ID!
+  foreignAsset: Token!
+  creation: BigInt!
+  liquidity: BigInt!
+  originalNative: BigInt!
+  originalForeign: BigInt!
+  isDeleted: Boolean!
+}
+
+type PairInfo @entity {
+  id: ID!
+  foreignAsset: Token!
+  totalSupply: BigInt!
+  reserveNative: BigInt!
+  reserveForeign: BigInt!
+  blockTimestampLast: BigInt!
+  nativeLast: BigInt!
+  foreignLast: BigInt!
+}
+
+type BurnEvent @entity {
+  id: ID!
+  sender: Account!
+  amount0: BigInt!
+  amount1: BigInt!
+  to: Account!
+}
+
+type MintEvent @entity {
+  id: ID!
+  sender: Account!
+  to: Account!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type PositionOpenedEvent @entity {
+  id: ID!
+  from: Account!
+  to: Account!
+  index: BigInt!
+  liquidity: BigInt!
+}
+
+type PositionClosedEvent @entity {
+  id: ID!
+  sender: Account!
+  index: BigInt!
+  liquidity: BigInt!
+  loss: BigInt!
+}
+
+type QueueActiveEvent @entity {
+  id: ID!
+  activated: Boolean!
+}
+
+type SwapEvent @entity {
+  id: ID!
+  foreignAsset: Token!
+  sender: Account!
+  amount0In: BigInt!
+  amount1In: BigInt!
+  amount0Out: BigInt!
+  amount1Out: BigInt!
+  to: Account!
+}
+
+type SyncEvent @entity {
+  id: ID!
+  foreignAsset: Token!
+  reserve0: BigInt!
+  reserve1: BigInt!
 }
 
 # =================== LinearVesting ======================
@@ -316,78 +397,4 @@ type QueueTransactionEvent @entity {
   signature: String!
   data: Bytes!
   eta: BigInt!
-}
-
-# ===================== VaderPool ========================
-type Pool @entity {
-  id: ID!
-  address: Bytes!
-  nativeAsset: Token!
-  foreignAsset: Token!
-  reserveNative: BigInt!
-  reserveForeign: BigInt!
-  blockTimestampLast: BigInt!
-  queueActive: Boolean!
-}
-
-type Position @entity {
-  id: ID!
-  pool: Pool!
-  index: BigInt!
-  creation: BigInt!
-  liquidity: BigInt!
-  originalNative: BigInt!
-  originalForeign: BigInt!
-}
-
-type BurnEvent @entity {
-  id: ID!
-  sender: Account!
-  amount0: BigInt!
-  amount1: BigInt!
-  to: Account!
-}
-
-type MintEvent @entity {
-  id: ID!
-  sender: Account!
-  to: Account!
-  amount0: BigInt!
-  amount1: BigInt!
-}
-
-type PositionOpenedEvent @entity {
-  id: ID!
-  sender: Account!
-  index: BigInt!
-  liquidity: BigInt!
-}
-
-type PositionClosedEvent @entity {
-  id: ID!
-  sender: Account!
-  index: BigInt!
-  liquidity: BigInt!
-  loss: BigInt!
-}
-
-type QueueActiveEvent @entity {
-  id: ID!
-  activated: Boolean!
-}
-
-type SwapEvent @entity {
-  id: ID!
-  sender: Account!
-  amount0In: BigInt!
-  amount1In: BigInt!
-  amount0Out: BigInt!
-  amount1Out: BigInt!
-  to: Account!
-}
-
-type SyncEvent @entity {
-  id: ID!
-  reserve0: BigInt!
-  reserve1: BigInt!
 }

@@ -1,13 +1,16 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 import {
   Burn,
+  BurnCall,
   Mint,
+  MintCall,
   PositionClosed,
   PositionOpened,
   QueueActive,
+  SetTokenSupportCall,
   Swap,
   Sync
-} from "../../generated/templates/VaderPool/VaderPool";
+} from "../../generated/VaderPoolV2/VaderPoolV2";
 import {
   BurnEvent,
   MintEvent,
@@ -21,10 +24,28 @@ import {
   createOrUpdateGlobal,
   getOrCreateAccount,
   getOrCreateGlobal,
-  getOrCreatePool,
-  getOrCreatePosition
+  getOrCreatePairInfo,
+  getOrCreatePosition,
+  getOrCreateToken,
+  UINT112_MAX,
+  UINT32_MAX,
+  ZERO
 } from "./common";
 import { convertStringToBigInt } from "./util";
+
+export function handleBurn(
+  _call: BurnCall
+): void {
+  let position = getOrCreatePosition(_call.inputs.id);
+  let token = getOrCreateToken(position.foreignAsset);
+
+  let pairInfo = getOrCreatePairInfo(token.id);
+  pairInfo.totalSupply = pairInfo.totalSupply.minus(position.liquidity);
+  pairInfo.save();
+
+  position.isDeleted = true;
+  position.save();
+}
 
 export function handleBurnEvent(
   _event: Burn
@@ -41,30 +62,37 @@ export function handleBurnEvent(
   event.save();
 }
 
-export function handleMintEvent(
-  _event: Mint
+export function handleMint(
+  _call: MintCall
 ): void {
-  let sender = getOrCreateAccount(_event.params.sender.toHexString());
-  let receiver = getOrCreateAccount(_event.params.to.toHexString());
+  let token = getOrCreateToken(_call.inputs.foreignAsset.toHexString());
 
-  let globalValue = getOrCreateGlobal(
-    _event.address.toHexString() + '_positionId'
-  ).value;
+  let pairInfo = getOrCreatePairInfo(token.id);
+  pairInfo.totalSupply = pairInfo.totalSupply.plus(_call.outputs.liquidity);
+  pairInfo.save();
+
+  let globalValue = getOrCreateGlobal('positionId').value;
   let positionIndex = BigInt.fromI32(1);
   if (globalValue.length > 0) {
     positionIndex = convertStringToBigInt(globalValue).plus(BigInt.fromI32(1));
   }
 
-  createOrUpdateGlobal(
-    _event.address.toHexString() + '_positionId',
-    positionIndex.toString()
-  );
+  createOrUpdateGlobal('positionId', positionIndex.toString());
 
-  let position = getOrCreatePosition(_event.address.toHexString(), positionIndex);
-  position.creation = _event.block.timestamp;
-  position.originalNative = _event.params.amount0;
-  position.originalForeign = _event.params.amount1;
+  let position = getOrCreatePosition(positionIndex);
+  position.foreignAsset = token.id;
+  position.creation = _call.block.timestamp;
+  position.originalNative = _call.inputs.nativeDeposit;
+  position.originalForeign = _call.inputs.foreignDeposit;
+  position.liquidity = _call.outputs.liquidity;
   position.save();
+}
+
+export function handleMintEvent(
+  _event: Mint
+): void {
+  let sender = getOrCreateAccount(_event.params.sender.toHexString());
+  let receiver = getOrCreateAccount(_event.params.to.toHexString());
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new MintEvent(eventId);
@@ -78,15 +106,17 @@ export function handleMintEvent(
 export function handlePositionOpenedEvent(
   _event: PositionOpened
 ): void {
-  let sender = getOrCreateAccount(_event.params.sender.toHexString());
+  let fromAccount = getOrCreateAccount(_event.params.from.toHexString());
+  let toAccount = getOrCreateAccount(_event.params.to.toHexString());
 
-  let position = getOrCreatePosition(_event.address.toHexString(), _event.params.id);
+  let position = getOrCreatePosition(_event.params.id);
   position.liquidity = _event.params.liquidity;
   position.save();
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new PositionOpenedEvent(eventId);
-  event.sender = sender.id;
+  event.from = fromAccount.id;
+  event.to = toAccount.id;
   event.index = _event.params.id;
   event.liquidity = _event.params.liquidity;
   event.save();
@@ -109,10 +139,6 @@ export function handlePositionClosedEvent(
 export function handleQueueActiveEvent(
   _event: QueueActive
 ): void {
-  let pool = getOrCreatePool(_event.address.toHexString());
-  pool.queueActive = _event.params.activated;
-  pool.save();
-
   let eventId = _event.transaction.hash.toHexString();
   let event = new QueueActiveEvent(eventId);
   event.activated = _event.params.activated;
@@ -124,9 +150,11 @@ export function handleSwapEvent(
 ): void {
   let sender = getOrCreateAccount(_event.params.sender.toHexString());
   let receiver = getOrCreateAccount(_event.params.to.toHexString());
+  let token = getOrCreateToken(_event.params.foreignAsset.toHexString());
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SwapEvent(eventId);
+  event.foreignAsset = token.id;
   event.sender = sender.id;
   event.amount0In = _event.params.amount0In;
   event.amount1In = _event.params.amount1In;
@@ -139,15 +167,41 @@ export function handleSwapEvent(
 export function handleSyncEvent(
   _event: Sync
 ): void {
-  let pool = getOrCreatePool(_event.address.toHexString());
-  pool.reserveNative = _event.params.reserve0;
-  pool.reserveForeign = _event.params.reserve1;
-  pool.blockTimestampLast = _event.block.timestamp;
-  pool.save();
+  let token = getOrCreateToken(_event.params.foreignAsset.toHexString());
+  let pairInfo = getOrCreatePairInfo(token.id);
+
+  let blockTimestamp = _event.block.timestamp.mod(UINT32_MAX);
+  let timeElapsed = blockTimestamp.minus(pairInfo.blockTimestampLast);
+  let reserveNative = pairInfo.reserveNative;
+  let reserveForeign = pairInfo.reserveForeign;
+  let nativeLast = pairInfo.nativeLast;
+  let foreignLast = pairInfo.foreignLast;
+
+  if (timeElapsed.gt(ZERO) && !reserveNative.isZero() && !reserveForeign.isZero()) {
+    pairInfo.nativeLast = nativeLast.plus(
+      reserveForeign.times(UINT112_MAX).div(reserveNative).times(timeElapsed)
+    );
+    pairInfo.foreignLast = foreignLast.plus(
+      reserveNative.times(UINT112_MAX).div(reserveForeign).times(timeElapsed)
+    );
+  }
+  pairInfo.reserveNative = _event.params.reserve0;
+  pairInfo.reserveForeign = _event.params.reserve1;
+  pairInfo.blockTimestampLast = blockTimestamp;
+  pairInfo.save();
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SyncEvent(eventId);
+  event.foreignAsset = token.id;
   event.reserve0 = _event.params.reserve0;
   event.reserve1 = _event.params.reserve1;
   event.save();
+}
+
+export function handleSetTokenSupport(
+  _call: SetTokenSupportCall
+): void {
+  let token = getOrCreateToken(_call.inputs.foreignAsset.toHexString());
+  token.isSupported = _call.inputs.support;
+  token.save();
 }
