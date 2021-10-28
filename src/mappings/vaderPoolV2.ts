@@ -1,5 +1,8 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 import {
+  Approval,
+  ApprovalForAll,
+  Transfer,
   Burn,
   BurnCall,
   Mint,
@@ -12,6 +15,7 @@ import {
   Sync
 } from "../../generated/VaderPoolV2/VaderPoolV2";
 import {
+  NFTApproval,
   BurnEvent,
   MintEvent,
   PositionClosedEvent,
@@ -21,6 +25,8 @@ import {
   SyncEvent
 } from "../../generated/schema";
 import {
+  createApprovalEvent,
+  createTransferEvent,
   createOrUpdateGlobal,
   getOrCreateAccount,
   getOrCreateGlobal,
@@ -33,10 +39,59 @@ import {
 } from "./common";
 import { convertStringToBigInt } from "./util";
 
+export function handleApprovalEvent(
+  _event: Approval
+): void {
+  createApprovalEvent(
+    _event.transaction.hash.toHexString(),
+    _event.address.toHexString(),
+    _event.params.owner.toHexString(),
+    _event.params.approved.toHexString(),
+    _event.params.tokenId,
+    true
+  );
+}
+
+export function handleApprovalForAllEvent(
+  _event: ApprovalForAll
+): void {
+  let approvalId = _event.address.toHexString()
+    + '_' + _event.params.owner.toHexString()
+    + '_' + _event.params.operator.toHexString();
+  let approval = NFTApproval.load(approvalId);
+
+  if (!approval) {
+    approval = new NFTApproval(approvalId);
+    let token = getOrCreateToken(_event.address.toHexString());
+    let ownerAccount = getOrCreateAccount(_event.params.owner.toHexString());
+    let operatorAccount = getOrCreateAccount(_event.params.operator.toHexString());
+    approval.token = token.id;
+    approval.owner = ownerAccount.id;
+    approval.operator = operatorAccount.id;
+    approval.approved = false;
+  }
+
+  approval.approved = _event.params.approved;
+  approval.save();
+}
+
+export function handleTransferEvent(
+  _event: Transfer
+): void {
+  createTransferEvent(
+    _event.transaction.hash.toHexString(),
+    _event.address.toHexString(),
+    _event.params.from.toHexString(),
+    _event.params.to.toHexString(),
+    _event.params.tokenId,
+    true
+  );
+}
+
 export function handleBurn(
   _call: BurnCall
 ): void {
-  let position = getOrCreatePosition(_call.inputs.id);
+  let position = getOrCreatePosition(_call.to.toHexString(), _call.inputs.id);
   let token = getOrCreateToken(position.foreignAsset);
 
   let pairInfo = getOrCreatePairInfo(token.id);
@@ -79,7 +134,7 @@ export function handleMint(
 
   createOrUpdateGlobal('positionId', positionIndex.toString());
 
-  let position = getOrCreatePosition(positionIndex);
+  let position = getOrCreatePosition(_call.to.toHexString(), positionIndex);
   position.foreignAsset = token.id;
   position.creation = _call.block.timestamp;
   position.originalNative = _call.inputs.nativeDeposit;
@@ -109,7 +164,9 @@ export function handlePositionOpenedEvent(
   let fromAccount = getOrCreateAccount(_event.params.from.toHexString());
   let toAccount = getOrCreateAccount(_event.params.to.toHexString());
 
-  let position = getOrCreatePosition(_event.params.id);
+  let position = getOrCreatePosition(
+    _event.address.toHexString(), _event.params.id
+  );
   position.liquidity = _event.params.liquidity;
   position.save();
 

@@ -14,6 +14,8 @@ import {
   QueuedTransaction,
   Allowance,
   Balance,
+  NFTAllowance,
+  NFTItem,
   ApprovalEvent,
   TransferEvent,
   Vest,
@@ -213,8 +215,10 @@ export function getOrCreatePairInfo(
 }
 
 export function getOrCreatePosition(
+  _address: string,
   _id: BigInt
 ): Position {
+  let nftItem = getOrCreateNFTItem(_address, _id);
   let positionId = _id.toString();
   let position = Position.load(positionId);
 
@@ -225,6 +229,7 @@ export function getOrCreatePosition(
     position.liquidity = ZERO;
     position.originalNative = ZERO;
     position.originalForeign = ZERO;
+    position.nftItem = nftItem.id;
     position.isDeleted = false;
     position.save();
   }
@@ -252,25 +257,42 @@ export function createOrUpdateAllowance(
   _address: string,
   _owner: string,
   _spender: string,
-  _value: BigInt
-): Allowance {
-  let allowanceId = _address + '_' + _owner + '_' + _spender;
-  let allowance = Allowance.load(allowanceId);
+  _value: BigInt,
+  _isNFT: boolean
+): void {
+  if (_isNFT) {
+    let allowanceId = _address + '_' + _owner + '_' + _spender + '_' + _value.toString();
+    let allowance = NFTAllowance.load(allowanceId);
 
-  if (!allowance) {
-    allowance = new Allowance(allowanceId);
-    let token = getOrCreateToken(_address);
-    let ownerAccount = getOrCreateAccount(_owner);
-    let spenderAccount = getOrCreateAccount(_spender);
-    allowance.token = token.id;
-    allowance.owner = ownerAccount.id;
-    allowance.spender = spenderAccount.id;
+    if (!allowance) {
+      allowance = new NFTAllowance(allowanceId);
+      let token = getOrCreateToken(_address);
+      let ownerAccount = getOrCreateAccount(_owner);
+      let spenderAccount = getOrCreateAccount(_spender);
+      allowance.token = token.id;
+      allowance.owner = ownerAccount.id;
+      allowance.spender = spenderAccount.id;
+      allowance.tokenId = _value;
+    }
+
+    allowance.save();
+  } else {
+    let allowanceId = _address + '_' + _owner + '_' + _spender;
+    let allowance = Allowance.load(allowanceId);
+
+    if (!allowance) {
+      allowance = new Allowance(allowanceId);
+      let token = getOrCreateToken(_address);
+      let ownerAccount = getOrCreateAccount(_owner);
+      let spenderAccount = getOrCreateAccount(_spender);
+      allowance.token = token.id;
+      allowance.owner = ownerAccount.id;
+      allowance.spender = spenderAccount.id;
+    }
+
+    allowance.amount = _value;
+    allowance.save();
   }
-
-  allowance.amount = _value;
-  allowance.save();
-
-  return allowance as Allowance;
 }
 
 export function createApprovalEvent(
@@ -278,13 +300,15 @@ export function createApprovalEvent(
   _address: string,
   _owner: string,
   _spender: string,
-  _value: BigInt
+  _value: BigInt,
+  _isNFT: boolean = false
 ): ApprovalEvent {
   createOrUpdateAllowance(
     _address,
     _owner,
     _spender,
-    _value
+    _value,
+    _isNFT
   );
 
   let approvalId = _hash;
@@ -333,45 +357,86 @@ export function createOrUpdateBalance(
   balance.save();
 }
 
+export function getOrCreateNFTItem(
+  _token: string,
+  _tokenId: BigInt
+): NFTItem {
+  let token = getOrCreateToken(_token);
+
+  let itemId = _token + '_' + _tokenId.toString();
+  let item = NFTItem.load(itemId);
+
+  if (!item) {
+    item = new NFTItem(itemId);
+    item.owner = ZERO_ADDRESS;
+    item.token = token.id;
+    item.tokenId = _tokenId;
+    item.save();
+  }
+
+  return item as NFTItem;
+}
+
+export function createOrUpdateNFTItem(
+  _account: string,
+  _token: string,
+  _tokenId: BigInt
+): void {
+  let account = getOrCreateAccount(_account);
+
+  let item = getOrCreateNFTItem(_token, _tokenId);
+  item.owner = account.id;
+  item.save();
+}
+
 export function createTransferEvent(
   _hash: string,
   _address: string,
   _from: string,
   _to: string,
-  _value: BigInt
+  _value: BigInt,
+  _isNFT: boolean = false
 ): void {
   let token = getOrCreateToken(_address);
   let fromAccount = getOrCreateAccount(_from);
   let toAccount = getOrCreateAccount(_to);
 
-  if (_from != ZERO_ADDRESS) {
-    createOrUpdateBalance(
-      _from,
-      _address,
-      getOrCreateBalance(
-        _from,
-        _address
-      ).balance.minus(_value)
-    );
-    fromAccount.save();
-  } else {
-    token.totalSupply = token.totalSupply.plus(_value);
-    token.save();
-  }
-
-  if (_to != ZERO_ADDRESS) {
-    createOrUpdateBalance(
+  if (_isNFT) {
+    createOrUpdateNFTItem(
       _to,
       _address,
-      getOrCreateBalance(
-        _to,
-        _address
-      ).balance.plus(_value)
+      _value
     );
-    toAccount.save();
   } else {
-    token.totalSupply = token.totalSupply.minus(_value);
-    token.save();
+    if (_from != ZERO_ADDRESS) {
+      createOrUpdateBalance(
+        _from,
+        _address,
+        getOrCreateBalance(
+          _from,
+          _address
+        ).balance.minus(_value)
+      );
+      fromAccount.save();
+    } else {
+      token.totalSupply = token.totalSupply.plus(_value);
+      token.save();
+    }
+
+    if (_to != ZERO_ADDRESS) {
+      createOrUpdateBalance(
+        _to,
+        _address,
+        getOrCreateBalance(
+          _to,
+          _address
+        ).balance.plus(_value)
+      );
+      toAccount.save();
+    } else {
+      token.totalSupply = token.totalSupply.minus(_value);
+      token.save();
+    }
   }
 
   let transferEvent = new TransferEvent(_hash);

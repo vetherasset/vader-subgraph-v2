@@ -151,6 +151,12 @@ dataSources:
         - name: VaderPoolV2
           file: ./abis/VaderPoolV2.json
       eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApprovalEvent
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAllEvent
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransferEvent
         - event: Burn(indexed address,uint256,uint256,indexed address)
           handler: handleBurnEvent
         - event: Mint(indexed address,indexed address,uint256,uint256)

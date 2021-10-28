@@ -35,7 +35,9 @@ type Account @entity {
   address: Bytes!
   isUntaxed: Boolean!
   token: [Balance]! @derivedFrom(field: "account")
+  nft: [NFTItem]! @derivedFrom(field: "owner")
   allowance: [Allowance]! @derivedFrom(field: "owner")
+  nftAllowance: [NFTAllowance]! @derivedFrom(field: "owner")
   vest: [Vest]! @derivedFrom(field: "account")
   burnSenderEvent: [BurnEvent]! @derivedFrom(field: "sender")
   burnToEvent: [BurnEvent]! @derivedFrom(field: "to")
@@ -73,7 +75,9 @@ type Token @entity {
   totalSupply: BigInt!
   isSupported: Boolean!
   holder: [Balance]! @derivedFrom(field: "token")
+  nftHolder: [NFTItem]! @derivedFrom(field: "token")
   allowance: [Allowance]! @derivedFrom(field: "token")
+  nftAllowance: [NFTAllowance]! @derivedFrom(field: "token")
   position: [Position]! @derivedFrom(field: "foreignAsset")
   pairInfo: [PairInfo]! @derivedFrom(field: "foreignAsset")
   swapEvent: [SwapEvent]! @derivedFrom(field: "foreignAsset")
@@ -155,6 +159,29 @@ type LossCoveredEvent @entity {
 }
 
 # ===================== VaderPoolV2 ========================
+type NFTApproval @entity {
+  id: ID!
+  token: Token!
+  owner: Account!
+  operator: Account!
+  approved: Boolean!
+}
+
+type NFTAllowance @entity {
+  id: ID!
+  token: Token!
+  owner: Account!
+  spender: Account!
+  tokenId: BigInt!
+}
+
+type NFTItem @entity {
+  id: ID!
+  owner: Account!
+  token: Token!
+  tokenId: BigInt!
+}
+
 type Position @entity {
   id: ID!
   foreignAsset: Token!
@@ -162,6 +189,7 @@ type Position @entity {
   liquidity: BigInt!
   originalNative: BigInt!
   originalForeign: BigInt!
+  nftItem: NFTItem!
   isDeleted: Boolean!
 }
 
