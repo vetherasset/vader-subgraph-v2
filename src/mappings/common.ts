@@ -223,8 +223,9 @@ export function getOrCreatePosition(
   let position = Position.load(positionId);
 
   if (!position) {
+    let token = getOrCreateToken(ZERO_ADDRESS);
     position = new Position(positionId);
-    position.foreignAsset = ZERO_ADDRESS;
+    position.foreignAsset = token.id;
     position.creation = ZERO;
     position.liquidity = ZERO;
     position.originalNative = ZERO;

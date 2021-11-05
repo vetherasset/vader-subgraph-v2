@@ -13,9 +13,9 @@ dataSources:
     name: Vader
     network: kovan
     source:
-      address: "0xE8bD273f54a990007b1069a15b66B584abc86e04"
+      address: "0x4ad25191285440992981B5B840F164b026bCE2A8"
       abi: Vader
-      startBlock: 27956678
+      startBlock: 28115418
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -52,9 +52,9 @@ dataSources:
     name: USDV
     network: kovan
     source:
-      address: "0xE90E0A75694Fc97576868243AD0364d10291f48A"
+      address: "0xfd87ba583bd2071713fb5CB12086536a26eec18e"
       abi: USDV
-      startBlock: 27959344
+      startBlock: 28115780
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -81,9 +81,9 @@ dataSources:
     name: Converter
     network: kovan
     source:
-      address: "0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5"
+      address: "0x49CD0e2C632FBb9765520798a93272BeB44278bC"
       abi: Converter
-      startBlock: 27956747
+      startBlock: 28115482
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -108,9 +108,9 @@ dataSources:
     name: VaderReserve
     network: kovan
     source:
-      address: "0x176207eD5Ae8c41F766E8C31112c7cDdE5Fb32AA"
+      address: "0xd3d6e14150530105ef7873D860BEc97F75a4F369"
       abi: VaderReserve
-      startBlock: 27959289
+      startBlock: 28115698
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -137,9 +137,9 @@ dataSources:
     name: VaderPoolV2
     network: kovan
     source:
-      address: "0x795bE6b0BF54AF587385604B9DB869E797db69E0"
+      address: "0xf780120f249Cd518309a2315b73288B05Ff6Abc3"
       abi: VaderPoolV2
-      startBlock: 27959008
+      startBlock: 28115871
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -185,9 +185,9 @@ dataSources:
     name: LinearVesting
     network: kovan
     source:
-      address: "0xEa66FB7590147A5C901E14034f243e1cF8f958ff"
+      address: "0x54f208B5fF23F87c26d139Cbc410ECaA8d28360C"
       abi: LinearVesting
-      startBlock: 27956766
+      startBlock: 28115531
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -214,9 +214,9 @@ dataSources:
     name: GovernorAlpha
     network: kovan
     source:
-      address: "0x34e9Db9bC8c668E2fa922c1d22913DCd587607D8"
+      address: "0xa8D27FEF019B93Cb99e1a51ef463919ec4BDAb0e"
       abi: GovernorAlpha
-      startBlock: 27959549
+      startBlock: 28116483
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -257,9 +257,9 @@ dataSources:
     name: Timelock
     network: kovan
     source:
-      address: "0x7574D631E9b402917cC478ac568b465D7F726033"
+      address: "0x02e3157Df831C3454d008901ddBB108C301E378a"
       abi: Timelock
-      startBlock: 27959607
+      startBlock: 28116418
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

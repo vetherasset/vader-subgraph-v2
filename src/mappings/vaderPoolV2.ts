@@ -127,7 +127,7 @@ export function handleMint(
   pairInfo.save();
 
   let globalValue = getOrCreateGlobal('positionId').value;
-  let positionIndex = BigInt.fromI32(1);
+  let positionIndex = ZERO;
   if (globalValue.length > 0) {
     positionIndex = convertStringToBigInt(globalValue).plus(BigInt.fromI32(1));
   }
