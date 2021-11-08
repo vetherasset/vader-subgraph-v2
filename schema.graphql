@@ -427,3 +427,10 @@ type QueueTransactionEvent @entity {
   data: Bytes!
   eta: BigInt!
 }
+
+type XVaderPrice @entity {
+  id: ID!
+  xvaderTotalSupply: BigInt!
+  vaderTotalLocked: BigInt!
+  price: BigDecimal!
+}

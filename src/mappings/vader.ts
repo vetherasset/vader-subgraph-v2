@@ -24,7 +24,9 @@ import {
   getOrCreateGlobal,
   getOrCreateToken,
   initConstants,
-  setUntaxed
+  setUntaxed,
+  createOrUpdateXVaderPrice,
+  XVADER_ADDRESS,
 } from "./common";
 
 export function handleApprovalEvent(
@@ -57,6 +59,12 @@ export function handleTransferEvent(
     _event.params.to.toHexString(),
     _event.params.value
   );
+
+  if (_event.params.from.equals(XVADER_ADDRESS) ||
+    _event.params.to.equals(XVADER_ADDRESS)
+  ) {
+    createOrUpdateXVaderPrice()
+  }
 }
 
 export function handleEmissionEvent(
