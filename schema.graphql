@@ -78,7 +78,7 @@ type Token @entity {
   nftHolder: [NFTItem]! @derivedFrom(field: "token")
   allowance: [Allowance]! @derivedFrom(field: "token")
   nftAllowance: [NFTAllowance]! @derivedFrom(field: "token")
-  position: [Position]! @derivedFrom(field: "foreignAsset")
+  foreignAssetPosition: [Position]! @derivedFrom(field: "foreignAsset")
   pairInfo: [PairInfo]! @derivedFrom(field: "foreignAsset")
   swapEvent: [SwapEvent]! @derivedFrom(field: "foreignAsset")
   syncEvent: [SyncEvent]! @derivedFrom(field: "foreignAsset")
@@ -180,6 +180,7 @@ type NFTItem @entity {
   owner: Account!
   token: Token!
   tokenId: BigInt!
+  position: [Position]! @derivedFrom(field: "nftItem")
 }
 
 type Position @entity {
