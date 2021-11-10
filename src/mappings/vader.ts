@@ -28,6 +28,7 @@ import {
   createOrUpdateXVaderPrice,
   XVADER_ADDRESS,
 } from "./common";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 export function handleApprovalEvent(
   _event: Approval
@@ -59,9 +60,10 @@ export function handleTransferEvent(
     _event.params.to.toHexString(),
     _event.params.value
   );
-
-  if (_event.params.from.equals(XVADER_ADDRESS) ||
-    _event.params.to.equals(XVADER_ADDRESS)
+  
+  let xvaderAddress = Address.fromString(XVADER_ADDRESS);
+  if (_event.params.from.equals(xvaderAddress) ||
+    _event.params.to.equals(xvaderAddress)
   ) {
     createOrUpdateXVaderPrice()
   }

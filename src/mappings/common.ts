@@ -2,7 +2,6 @@ import {
   Address,
   BigInt,
   Bytes,
-  BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
   Global,
@@ -21,10 +20,7 @@ import {
   TransferEvent,
   Vest,
   VetoStatus,
-  XVaderPrice,
 } from "../../generated/schema";
-import { XVader } from "../../generated/XVader/XVader"
-import { Vader } from "../../generated/Vader/Vader"
 
 export let ZERO = BigInt.fromI32(0);
 export let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -47,8 +43,8 @@ export let MAX_FEE_BASIS_POINTS = BigInt.fromI32(1_00);
 export let BURN = "0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD";
 export let UINT32_MAX = BigInt.fromI32(2).pow(32);
 export let UINT112_MAX = BigInt.fromI32(2).pow(112);
-export let XVADER_ADDRESS = Address.fromString('0x42980De4BF7926448ec75812955eB2762F067c30');
-export let VADER_ADDRESS = Address.fromString('0xb0c3f757b1a62701835fb4e9175e9589ed5687fe');
+export let XVADER_ADDRESS = '0x42980De4BF7926448ec75812955eB2762F067c30';
+export let VADER_ADDRESS = '0x4ad25191285440992981B5B840F164b026bCE2A8';
 
 export function initConstants(): void {
   createOrUpdateGlobal('INITIAL_VADER_SUPPLY', INITIAL_VADER_SUPPLY.toString());
@@ -464,20 +460,12 @@ export function setUntaxed(
 }
 
 export function createOrUpdateXVaderPrice(): void {
-  let tokenPrice = XVaderPrice.load(XVADER_ADDRESS.toHex())
-  if (tokenPrice == null) {
-    tokenPrice = new XVaderPrice(XVADER_ADDRESS.toHex())
-  }
-  let xvaderContract = XVader.bind(XVADER_ADDRESS)
-  let xvaderTotalSupply = xvaderContract.totalSupply()
-  let vaderContract = Vader.bind(VADER_ADDRESS)
-  let vaderTotalLocked = vaderContract.balanceOf(XVADER_ADDRESS)
-  tokenPrice.xvaderTotalSupply = xvaderTotalSupply
-  tokenPrice.vaderTotalLocked = vaderTotalLocked
-  let price = BigDecimal.fromString('1');
+  let xvaderToken = getOrCreateToken(XVADER_ADDRESS)
+  let xvaderTotalSupply = xvaderToken.totalSupply
+  let vaderTotalLocked = getOrCreateBalance(XVADER_ADDRESS, VADER_ADDRESS).balance;
+  let price = '1';
   if (xvaderTotalSupply.gt(BigInt.fromI32(0))) {
-    price = vaderTotalLocked.toBigDecimal().div(xvaderTotalSupply.toBigDecimal())
+    price = vaderTotalLocked.toBigDecimal().div(xvaderTotalSupply.toBigDecimal()).toString()
   }
-  tokenPrice.price = price
-  tokenPrice.save()
+  createOrUpdateGlobal('XVADER_PRICE', price)
 }

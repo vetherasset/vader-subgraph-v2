@@ -305,11 +305,12 @@ dataSources:
       abis:
         - name: XVader
           file: ./abis/XVader.json
-        - name: Vader
-          file: ./abis/Vader.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalEvent
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferEvent
+      callHandlers:
+        - function: enter(uint256)
+          handler: handleEnter
+        - function: leave(uint256)
+          handler: handleLeave
       file: ./src/mappings/xvader.ts
