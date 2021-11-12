@@ -1,7 +1,7 @@
 import {
   Address,
   BigInt,
-  Bytes
+  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   Global,
@@ -43,6 +43,8 @@ export let MAX_FEE_BASIS_POINTS = BigInt.fromI32(1_00);
 export let BURN = "0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD";
 export let UINT32_MAX = BigInt.fromI32(2).pow(32);
 export let UINT112_MAX = BigInt.fromI32(2).pow(112);
+export let XVADER_ADDRESS = '0x42980De4BF7926448ec75812955eB2762F067c30';
+export let VADER_ADDRESS = '0x4ad25191285440992981B5B840F164b026bCE2A8';
 
 export function initConstants(): void {
   createOrUpdateGlobal('INITIAL_VADER_SUPPLY', INITIAL_VADER_SUPPLY.toString());
@@ -455,4 +457,15 @@ export function setUntaxed(
   let account = getOrCreateAccount(_address);
   account.isUntaxed = _value;
   account.save();
+}
+
+export function createOrUpdateXVaderPrice(): void {
+  let xvaderToken = getOrCreateToken(XVADER_ADDRESS)
+  let xvaderTotalSupply = xvaderToken.totalSupply
+  let vaderTotalLocked = getOrCreateBalance(XVADER_ADDRESS, VADER_ADDRESS).balance;
+  let price = '1';
+  if (xvaderTotalSupply.gt(BigInt.fromI32(0))) {
+    price = vaderTotalLocked.toBigDecimal().div(xvaderTotalSupply.toBigDecimal()).toString()
+  }
+  createOrUpdateGlobal('XVADER_PRICE', price)
 }

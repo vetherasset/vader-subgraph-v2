@@ -24,8 +24,11 @@ import {
   getOrCreateGlobal,
   getOrCreateToken,
   initConstants,
-  setUntaxed
+  setUntaxed,
+  createOrUpdateXVaderPrice,
+  XVADER_ADDRESS,
 } from "./common";
+import { Address } from "@graphprotocol/graph-ts";
 
 export function handleApprovalEvent(
   _event: Approval
@@ -57,6 +60,13 @@ export function handleTransferEvent(
     _event.params.to.toHexString(),
     _event.params.value
   );
+  
+  let xvaderAddress = Address.fromString(XVADER_ADDRESS);
+  if (_event.params.from.equals(xvaderAddress) ||
+    _event.params.to.equals(xvaderAddress)
+  ) {
+    createOrUpdateXVaderPrice()
+  }
 }
 
 export function handleEmissionEvent(
