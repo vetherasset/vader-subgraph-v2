@@ -48,6 +48,7 @@ export function handleApprovalEvent(
     _event.params.owner.toHexString(),
     _event.params.approved.toHexString(),
     _event.params.tokenId,
+    _event.block.timestamp,
     true
   );
 }
@@ -63,8 +64,14 @@ export function handleApprovalForAllEvent(
   if (!approval) {
     approval = new NFTApproval(approvalId);
     let token = getOrCreateToken(_event.address.toHexString());
-    let ownerAccount = getOrCreateAccount(_event.params.owner.toHexString());
-    let operatorAccount = getOrCreateAccount(_event.params.operator.toHexString());
+    let ownerAccount = getOrCreateAccount(
+      _event.params.owner.toHexString(),
+      _event.block.timestamp
+    );
+    let operatorAccount = getOrCreateAccount(
+      _event.params.operator.toHexString(),
+      _event.block.timestamp
+    );
     approval.token = token.id;
     approval.owner = ownerAccount.id;
     approval.operator = operatorAccount.id;
@@ -84,6 +91,7 @@ export function handleTransferEvent(
     _event.params.from.toHexString(),
     _event.params.to.toHexString(),
     _event.params.tokenId,
+    _event.block.timestamp,
     true
   );
 }
@@ -105,8 +113,14 @@ export function handleBurn(
 export function handleBurnEvent(
   _event: Burn
 ): void {
-  let sender = getOrCreateAccount(_event.params.sender.toHexString());
-  let receiver = getOrCreateAccount(_event.params.to.toHexString());
+  let sender = getOrCreateAccount(
+    _event.params.sender.toHexString(),
+    _event.block.timestamp
+  );
+  let receiver = getOrCreateAccount(
+    _event.params.to.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new BurnEvent(eventId);
@@ -146,8 +160,14 @@ export function handleMint(
 export function handleMintEvent(
   _event: Mint
 ): void {
-  let sender = getOrCreateAccount(_event.params.sender.toHexString());
-  let receiver = getOrCreateAccount(_event.params.to.toHexString());
+  let sender = getOrCreateAccount(
+    _event.params.sender.toHexString(),
+    _event.block.timestamp
+  );
+  let receiver = getOrCreateAccount(
+    _event.params.to.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new MintEvent(eventId);
@@ -161,8 +181,14 @@ export function handleMintEvent(
 export function handlePositionOpenedEvent(
   _event: PositionOpened
 ): void {
-  let fromAccount = getOrCreateAccount(_event.params.from.toHexString());
-  let toAccount = getOrCreateAccount(_event.params.to.toHexString());
+  let fromAccount = getOrCreateAccount(
+    _event.params.from.toHexString(),
+    _event.block.timestamp
+  );
+  let toAccount = getOrCreateAccount(
+    _event.params.to.toHexString(),
+    _event.block.timestamp
+  );
 
   let position = getOrCreatePosition(
     _event.address.toHexString(), _event.params.id
@@ -182,7 +208,10 @@ export function handlePositionOpenedEvent(
 export function handlePositionClosedEvent(
   _event: PositionClosed
 ): void {
-  let sender = getOrCreateAccount(_event.params.sender.toHexString());
+  let sender = getOrCreateAccount(
+    _event.params.sender.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new PositionClosedEvent(eventId);
@@ -205,8 +234,14 @@ export function handleQueueActiveEvent(
 export function handleSwapEvent(
   _event: Swap
 ): void {
-  let sender = getOrCreateAccount(_event.params.sender.toHexString());
-  let receiver = getOrCreateAccount(_event.params.to.toHexString());
+  let sender = getOrCreateAccount(
+    _event.params.sender.toHexString(),
+    _event.block.timestamp
+  );
+  let receiver = getOrCreateAccount(
+    _event.params.to.toHexString(),
+    _event.block.timestamp
+  );
   let token = getOrCreateToken(_event.params.foreignAsset.toHexString());
 
   let eventId = _event.transaction.hash.toHexString();

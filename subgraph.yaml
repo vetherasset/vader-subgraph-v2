@@ -13,9 +13,9 @@ dataSources:
     name: Vader
     network: kovan
     source:
-      address: "0x4ad25191285440992981B5B840F164b026bCE2A8"
+      address: "0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE"
       abi: Vader
-      startBlock: 28115418
+      startBlock: 28597367
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -180,6 +180,55 @@ dataSources:
           handler: handleSetTokenSupport
       file: ./src/mappings/vaderPoolV2.ts
 
+    # ====================== SynthFactory =======================
+  - kind: ethereum/contract
+    name: SynthFactory
+    network: kovan
+    source:
+      address: "0xfdD944fa68C5a0D08D814E58a72a685BcA59105F"
+      abi: SynthFactory
+      startBlock: 28116126
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - token
+      abis:
+        - name: SynthFactory
+          file: ./abis/SynthFactory.json
+      callHandlers:
+        - function: createSynth(address)
+          handler: handleCreateSynth
+      file: ./src/mappings/synthFactory.ts
+
+    # ====================== XVaderPrice =======================
+  - kind: ethereum/contract
+    name: XVader
+    network: kovan
+    source:
+      address: "0x0AA1056Ee563C14484fCC530625cA74575C97512"
+      abi: XVader
+      startBlock: 28597635
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - XVaderPrice
+      abis:
+        - name: XVader
+          file: ./abis/XVader.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferEvent
+      callHandlers:
+        - function: enter(uint256)
+          handler: handleEnter
+        - function: leave(uint256)
+          handler: handleLeave
+      file: ./src/mappings/xvader.ts
+
   # ==================== LinearVesting ====================
   - kind: ethereum/contract
     name: LinearVesting
@@ -205,6 +254,8 @@ dataSources:
       eventHandlers:
         - event: Vested(indexed address,uint256)
           handler: handleVestedEvent
+        - event: VestingCreated(address,uint256)
+          handler: handleVestingCreatedEvent
         - event: VestingInitialized(uint256)
           handler: handleVestingInitializedEvent
       file: ./src/mappings/linearVesting.ts
@@ -288,29 +339,3 @@ dataSources:
         - event: QueueTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
           handler: handleQueueTransactionEvent
       file: ./src/mappings/timelock.ts
-    # ====================== XVaderPrice =======================
-  - kind: ethereum/contract
-    name: XVader
-    network: kovan
-    source:
-      address: "0x42980De4BF7926448ec75812955eB2762F067c30"
-      abi: XVader
-      startBlock: 28128602
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - XVaderPrice
-      abis:
-        - name: XVader
-          file: ./abis/XVader.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferEvent
-      callHandlers:
-        - function: enter(uint256)
-          handler: handleEnter
-        - function: leave(uint256)
-          handler: handleLeave
-      file: ./src/mappings/xvader.ts

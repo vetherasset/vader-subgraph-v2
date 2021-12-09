@@ -16,14 +16,15 @@ export function handleTransferEvent(
     _event.address.toHexString(),
     _event.params.from.toHexString(),
     _event.params.to.toHexString(),
-    _event.params.value
+    _event.params.value,
+    _event.block.timestamp
   );
 }
 
 export function handleEnter(_call: EnterCall): void {
-  createOrUpdateXVaderPrice()
+  createOrUpdateXVaderPrice(_call.block.timestamp);
 }
 
 export function handleLeave(_call: LeaveCall): void {
-  createOrUpdateXVaderPrice()
+  createOrUpdateXVaderPrice(_call.block.timestamp);
 }

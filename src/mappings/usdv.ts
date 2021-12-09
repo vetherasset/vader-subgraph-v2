@@ -15,7 +15,8 @@ export function handleApprovalEvent(
     _event.address.toHexString(),
     _event.params.owner.toHexString(),
     _event.params.spender.toHexString(),
-    _event.params.value
+    _event.params.value,
+    _event.block.timestamp
   );
 }
 
@@ -27,6 +28,7 @@ export function handleTransferEvent(
     _event.address.toHexString(),
     _event.params.from.toHexString(),
     _event.params.to.toHexString(),
-    _event.params.value
+    _event.params.value,
+    _event.block.timestamp
   );
 }

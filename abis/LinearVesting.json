@@ -7,14 +7,9 @@
                 "type": "address"
             },
             {
-                "internalType": "address[]",
-                "name": "vesters",
-                "type": "address[]"
-            },
-            {
-                "internalType": "uint192[]",
-                "name": "amounts",
-                "type": "uint192[]"
+                "internalType": "address",
+                "name": "_converter",
+                "type": "address"
             }
         ],
         "stateMutability": "nonpayable",
@@ -63,6 +58,25 @@
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "VestingCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
                 "internalType": "uint256",
                 "name": "duration",
                 "type": "uint256"
@@ -72,12 +86,75 @@
         "type": "event"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "vesters",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint192[]",
+                "name": "amounts",
+                "type": "uint192[]"
+            }
+        ],
+        "name": "begin",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "claim",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "vestedAmount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "converter",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "end",
         "outputs": [
             {
                 "internalType": "uint256",
                 "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_vester",
+                "type": "address"
+            }
+        ],
+        "name": "getClaim",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "vestedAmount",
                 "type": "uint256"
             }
         ],
@@ -162,40 +239,35 @@
                 "internalType": "uint64",
                 "name": "lastClaim",
                 "type": "uint64"
+            },
+            {
+                "internalType": "uint128",
+                "name": "start",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "end",
+                "type": "uint128"
             }
         ],
         "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getClaim",
-        "outputs": [
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
             {
                 "internalType": "uint256",
-                "name": "vestedAmount",
+                "name": "amount",
                 "type": "uint256"
             }
         ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "claim",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "vestedAmount",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "begin",
+        "name": "vestFor",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

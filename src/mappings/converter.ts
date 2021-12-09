@@ -5,7 +5,10 @@ import { getOrCreateAccount } from "./common";
 export function handleConversionEvent(
   _event: Conversion
 ): void {
-  let account = getOrCreateAccount(_event.params.user.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.user.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new ConversionEvent(eventId);

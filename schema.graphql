@@ -1,3 +1,11 @@
+enum DateType {
+  All
+  Year
+  Month
+  Day
+  Hour
+}
+
 enum ProposalState {
   Pending
   Active
@@ -13,6 +21,8 @@ type Global @entity {
   id: ID!
   name: String!
   value: String!
+  type: DateType
+  timestamp: Int
 }
 
 type Allowance @entity {
@@ -32,7 +42,9 @@ type Balance @entity {
 
 type Account @entity {
   id: ID!
+  index: Int!
   address: Bytes!
+  updatedAt: Int
   isUntaxed: Boolean!
   token: [Balance]! @derivedFrom(field: "account")
   nft: [NFTItem]! @derivedFrom(field: "owner")
@@ -74,6 +86,8 @@ type Token @entity {
   address: Bytes!
   totalSupply: BigInt!
   isSupported: Boolean!
+  isSynth: Boolean!
+  synth: Bytes
   holder: [Balance]! @derivedFrom(field: "token")
   nftHolder: [NFTItem]! @derivedFrom(field: "token")
   allowance: [Allowance]! @derivedFrom(field: "token")
@@ -266,11 +280,19 @@ type Vest @entity {
   account: Account!
   amount: BigInt!
   lastClaim: BigInt!
+  start: BigInt!
+  end: BigInt!
 }
 
 type VestedEvent @entity {
   id: ID!
   from: Account!
+  amount: BigInt!
+}
+
+type VestingCreatedEvent @entity {
+  id: ID!
+  user: Account!
   amount: BigInt!
 }
 

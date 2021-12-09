@@ -38,7 +38,8 @@ export function handleApprovalEvent(
     _event.address.toHexString(),
     _event.params.owner.toHexString(),
     _event.params.spender.toHexString(),
-    _event.params.value
+    _event.params.value,
+    _event.block.timestamp
   );
 }
 
@@ -58,14 +59,16 @@ export function handleTransferEvent(
     _event.address.toHexString(),
     _event.params.from.toHexString(),
     _event.params.to.toHexString(),
-    _event.params.value
+    _event.params.value,
+    _event.block.timestamp
   );
-  
+
   let xvaderAddress = Address.fromString(XVADER_ADDRESS);
-  if (_event.params.from.equals(xvaderAddress) ||
+  if (
+    _event.params.from.equals(xvaderAddress) ||
     _event.params.to.equals(xvaderAddress)
   ) {
-    createOrUpdateXVaderPrice()
+    createOrUpdateXVaderPrice(_event.block.timestamp);
   }
 }
 
@@ -96,7 +99,10 @@ export function handleEmissionChangedEvent(
 export function handleGrantClaimedEvent(
   _event: GrantClaimed
 ): void {
-  let account = getOrCreateAccount(_event.params.beneficiary.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.beneficiary.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new GrantClaimedEvent(eventId);
@@ -129,9 +135,9 @@ export function handleProtocolInitializedEvent(
   createOrUpdateGlobal('vest', vest.id);
   createOrUpdateGlobal('usdv', usdv.id);
 
-  setUntaxed(converter.toHexString(), true);
-  setUntaxed(vest.id, true);
-  setUntaxed(usdv.id, true);
+  setUntaxed(converter.toHexString(), true, _event.block.timestamp);
+  setUntaxed(vest.id, true, _event.block.timestamp);
+  setUntaxed(usdv.id, true, _event.block.timestamp);
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new ProtocolInitializedEvent(eventId);

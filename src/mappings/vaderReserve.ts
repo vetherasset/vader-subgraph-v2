@@ -14,7 +14,10 @@ import {
 export function handleGrantDistributedEvent(
   _event: GrantDistributed
 ): void {
-  let account = getOrCreateAccount(_event.params.recipient.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.recipient.toHexString(),
+    _event.block.timestamp
+  );
 
   createOrUpdateGlobal('lastGrant', _event.block.timestamp.toString());
 
@@ -28,7 +31,10 @@ export function handleGrantDistributedEvent(
 export function handleLossCoveredEvent(
   _event: LossCovered
 ): void {
-  let account = getOrCreateAccount(_event.params.recipient.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.recipient.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new LossCoveredEvent(eventId);

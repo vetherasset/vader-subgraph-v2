@@ -23,10 +23,12 @@ import {
 } from "../../generated/schema";
 
 export let ZERO = BigInt.fromI32(0);
+export let ONE = BigInt.fromI32(1);
+export let MONE = BigInt.fromI32(-1);
 export let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export let GWEI = BigInt.fromI32(1_000_000_000);
 export let ETHER = GWEI.times(GWEI);
-export let INITIAL_VADER_SUPPLY = BigInt.fromI32(2_500_000_000).times(ETHER);
+export let INITIAL_VADER_SUPPLY = BigInt.fromI32(250_000_000).times(BigInt.fromI32(10)).times(ETHER);
 export let VETH_ALLOCATION = GWEI.times(ETHER);
 export let VADER_VETHER_CONVERSION_RATE = BigInt.fromI32(1000);
 export let TEAM_ALLOCATION = BigInt.fromI32(250_000_000).times(ETHER);
@@ -43,8 +45,8 @@ export let MAX_FEE_BASIS_POINTS = BigInt.fromI32(1_00);
 export let BURN = "0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD";
 export let UINT32_MAX = BigInt.fromI32(2).pow(32);
 export let UINT112_MAX = BigInt.fromI32(2).pow(112);
-export let XVADER_ADDRESS = '0x42980De4BF7926448ec75812955eB2762F067c30';
-export let VADER_ADDRESS = '0x4ad25191285440992981B5B840F164b026bCE2A8';
+export let XVADER_ADDRESS = '0x0aa1056ee563c14484fcc530625ca74575c97512';
+export let VADER_ADDRESS = '0x1fd03e4ea209497910face52e5ca39124ef2e8be';
 
 export function initConstants(): void {
   createOrUpdateGlobal('INITIAL_VADER_SUPPLY', INITIAL_VADER_SUPPLY.toString());
@@ -61,15 +63,48 @@ export function initConstants(): void {
   createOrUpdateGlobal('BURN', BURN);
 }
 
+export function getBaseTimestamp(
+  _timestamp: BigInt,
+  _type: string
+): i32 {
+  let timestamp = _timestamp.toI32();
+  if (_type == 'All') {
+    timestamp = 0;
+  } else if (_type == 'Day') {
+    timestamp = timestamp / 86400 * 86400;
+  } else if (_type == 'Hour') {
+    timestamp = timestamp / 3600 * 3600;
+  }
+
+  return timestamp as i32;
+}
+
 export function getOrCreateGlobal(
-  _name: string
+  _name: string,
+  _timestamp: BigInt = null,
+  _type: string = null
 ): Global {
-  let global = Global.load(_name);
+  let globalId = _name;
+  let baseTime = 0;
+  if (_type) {
+    globalId = globalId + '_' + _type;
+    if (_timestamp) {
+      baseTime = getBaseTimestamp(_timestamp, _type);
+      globalId = globalId + '_' + baseTime.toString();
+    }
+  }
+
+  let global = Global.load(globalId);
 
   if (!global) {
-    global = new Global(_name);
+    global = new Global(globalId);
     global.name = _name;
     global.value = '';
+    if (_timestamp) {
+      global.value = '0';
+    }
+    global.type = _type;
+    global.timestamp = baseTime;
     global.save();
   }
 
@@ -79,22 +114,63 @@ export function getOrCreateGlobal(
 export function createOrUpdateGlobal(
   _name: string,
   _value: string,
+  _timestamp: BigInt = null,
+  _numValue: BigInt = ZERO,
+  _isExact: boolean = false
 ): void {
-  let global = getOrCreateGlobal(_name);
-  global.value = _value;
+  let global = getOrCreateGlobal(_name, _timestamp, null);
+  if (!_timestamp) {
+    global.value = _value;
+  } else {
+    if (_isExact) {
+      global.value = _value;
+    } else {
+      global.value = BigInt.fromString(global.value).plus(_numValue).toString();
+    }
+  }
   global.save();
+
+  if (_timestamp) {
+    let globalDay = getOrCreateGlobal(_name, _timestamp, "Day");
+    globalDay.value = global.value;
+    globalDay.save();
+
+    let globalHour = getOrCreateGlobal(_name, _timestamp, "Hour");
+    globalHour.value = global.value;
+    globalHour.save();
+
+    let globalNewDay = getOrCreateGlobal("New" + _name, _timestamp, "Day");
+    globalNewDay.value = BigInt.fromString(globalNewDay.value).plus(_numValue).toString();
+    globalNewDay.save();
+
+    let globalNewHour = getOrCreateGlobal("New" + _name, _timestamp, "Hour");
+    globalNewHour.value = BigInt.fromString(globalNewHour.value).plus(_numValue).toString();
+    globalNewHour.save();
+  }
 }
 
 export function getOrCreateAccount(
-  _address: string
+  _address: string,
+  _timestamp: BigInt = null
 ): Account {
   let accountId = _address;
   let account = Account.load(accountId);
 
   if (!account) {
+    let global = getOrCreateGlobal("Accounts", ZERO, null);
+
     account = new Account(accountId);
+    account.index = BigInt.fromString(global.value).toI32();
     account.address = Address.fromString(_address);
     account.isUntaxed = false;
+    account.save();
+
+    global.value = BigInt.fromString(global.value).plus(ONE).toString();
+    global.save();
+  }
+
+  if (_timestamp) {
+    account.updatedAt = _timestamp.toI32();
     account.save();
   }
 
@@ -111,6 +187,7 @@ export function getOrCreateToken(
     token.address = Address.fromString(_address);
     token.totalSupply = ZERO;
     token.isSupported = false;
+    token.isSynth = false;
     token.save();
   }
 
@@ -248,8 +325,11 @@ export function getOrCreateVest(
 
   if (!vest) {
     vest = new Vest(accountId);
+    vest.account = accountId;
     vest.amount = ZERO;
     vest.lastClaim = ZERO;
+    vest.start = ZERO;
+    vest.end = ZERO;
     vest.save();
   }
 
@@ -304,6 +384,7 @@ export function createApprovalEvent(
   _owner: string,
   _spender: string,
   _value: BigInt,
+  _timestamp: BigInt,
   _isNFT: boolean = false
 ): ApprovalEvent {
   createOrUpdateAllowance(
@@ -316,8 +397,8 @@ export function createApprovalEvent(
 
   let approvalId = _hash;
   let approval = new ApprovalEvent(approvalId);
-  let ownerAccount = getOrCreateAccount(_owner);
-  let spenderAccount = getOrCreateAccount(_spender);
+  let ownerAccount = getOrCreateAccount(_owner, _timestamp);
+  let spenderAccount = getOrCreateAccount(_spender, _timestamp);
   let token = getOrCreateToken(_address);
 
   approval.token = token.id;
@@ -353,9 +434,15 @@ export function getOrCreateBalance(
 export function createOrUpdateBalance(
   _account: string,
   _token: string,
-  _balance: BigInt
+  _balance: BigInt,
+  _timestamp: BigInt
 ): void {
   let balance = getOrCreateBalance(_account, _token);
+  if (balance.balance.gt(ZERO) && _balance.isZero()) {
+    createOrUpdateGlobal("UniqueWallet_" + _token, '', _timestamp, MONE);
+  } else if (balance.balance.isZero() && _balance.gt(ZERO)) {
+    createOrUpdateGlobal("UniqueWallet_" + _token, '', _timestamp, ONE);
+  }
   balance.balance = _balance;
   balance.save();
 }
@@ -398,11 +485,12 @@ export function createTransferEvent(
   _from: string,
   _to: string,
   _value: BigInt,
+  _timestamp: BigInt,
   _isNFT: boolean = false
 ): void {
   let token = getOrCreateToken(_address);
-  let fromAccount = getOrCreateAccount(_from);
-  let toAccount = getOrCreateAccount(_to);
+  let fromAccount = getOrCreateAccount(_from, _timestamp);
+  let toAccount = getOrCreateAccount(_to, _timestamp);
 
   if (_isNFT) {
     createOrUpdateNFTItem(
@@ -418,11 +506,12 @@ export function createTransferEvent(
         getOrCreateBalance(
           _from,
           _address
-        ).balance.minus(_value)
+        ).balance.minus(_isNFT ? ONE : _value),
+        _timestamp
       );
       fromAccount.save();
     } else {
-      token.totalSupply = token.totalSupply.plus(_value);
+      token.totalSupply = token.totalSupply.plus(_isNFT ? ONE : _value);
       token.save();
     }
 
@@ -433,11 +522,12 @@ export function createTransferEvent(
         getOrCreateBalance(
           _to,
           _address
-        ).balance.plus(_value)
+        ).balance.plus(_isNFT ? ONE : _value),
+        _timestamp
       );
       toAccount.save();
     } else {
-      token.totalSupply = token.totalSupply.minus(_value);
+      token.totalSupply = token.totalSupply.minus(_isNFT ? ONE : _value);
       token.save();
     }
   }
@@ -452,20 +542,30 @@ export function createTransferEvent(
 
 export function setUntaxed(
   _address: string,
-  _value: boolean
+  _value: boolean,
+  _timestamp: BigInt
 ): void {
-  let account = getOrCreateAccount(_address);
+  let account = getOrCreateAccount(_address, _timestamp);
   account.isUntaxed = _value;
   account.save();
 }
 
-export function createOrUpdateXVaderPrice(): void {
+export function createOrUpdateXVaderPrice(
+  _timestamp: BigInt
+): void {
   let xvaderToken = getOrCreateToken(XVADER_ADDRESS)
   let xvaderTotalSupply = xvaderToken.totalSupply
   let vaderTotalLocked = getOrCreateBalance(XVADER_ADDRESS, VADER_ADDRESS).balance;
-  let price = '1';
+  let price = ETHER.toString();
   if (xvaderTotalSupply.gt(BigInt.fromI32(0))) {
-    price = vaderTotalLocked.toBigDecimal().div(xvaderTotalSupply.toBigDecimal()).toString()
+    price = vaderTotalLocked.times(ETHER).div(xvaderTotalSupply).toString()
   }
-  createOrUpdateGlobal('XVADER_PRICE', price)
+  let xvaderPrice = getOrCreateGlobal('XVADER_PRICE', _timestamp);
+  createOrUpdateGlobal(
+    'XVADER_PRICE',
+    price,
+    _timestamp,
+    BigInt.fromString(xvaderPrice.value).minus(BigInt.fromString(price)),
+    true
+  );
 }

@@ -33,10 +33,12 @@ export function handleCouncilChangedEvent(
   _event: CouncilChanged
 ): void {
   let oldCouncil = getOrCreateAccount(
-    _event.params.newCouncil.toHexString()
+    _event.params.newCouncil.toHexString(),
+    _event.block.timestamp
   );
   let newCouncil = getOrCreateAccount(
-    _event.params.newCouncil.toHexString()
+    _event.params.newCouncil.toHexString(),
+    _event.block.timestamp
   );
 
   createOrUpdateGlobal('feeReceiver', newCouncil.id);
@@ -52,10 +54,12 @@ export function handleFeeReceiverChangedEvent(
   _event: FeeReceiverChanged
 ): void {
   let oldFeeReceiver = getOrCreateAccount(
-    _event.params.newFeeReceiver.toHexString()
+    _event.params.newFeeReceiver.toHexString(),
+    _event.block.timestamp
   );
   let newFeeReceiver = getOrCreateAccount(
-    _event.params.newFeeReceiver.toHexString()
+    _event.params.newFeeReceiver.toHexString(),
+    _event.block.timestamp
   );
 
   createOrUpdateGlobal('feeReceiver', newFeeReceiver.id);
@@ -82,7 +86,10 @@ export function handleFeeAmountChangedEvent(
 export function handleProposalCreatedEvent(
   _event: ProposalCreated
 ): void {
-  let account = getOrCreateAccount(_event.params.proposer.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.proposer.toHexString(),
+    _event.block.timestamp
+  );
 
   let proposal = getOrCreateProposal(_event.params.id);
   proposal.proposer = account.id;
@@ -170,7 +177,10 @@ export function handleProposalVetoedEvent(
 export function handleVoteCastEvent(
   _event: VoteCast
 ): void {
-  let account = getOrCreateAccount(_event.params.voter.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.voter.toHexString(),
+    _event.block.timestamp
+  );
 
   let receipt = getOrCreateReceipt(_event.params.proposalId, account.id);
   receipt.hasVoted = true;

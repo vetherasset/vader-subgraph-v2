@@ -28,7 +28,10 @@ import {
 export function handleNewAdminEvent(
   _event: NewAdmin
 ): void {
-  let account = getOrCreateAccount(_event.params.newAdmin.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.newAdmin.toHexString(),
+    _event.block.timestamp
+  );
 
   createOrUpdateGlobal('admin', account.id);
   createOrUpdateGlobal('pendingAdmin', ZERO_ADDRESS);
@@ -42,7 +45,10 @@ export function handleNewAdminEvent(
 export function handleNewPendingAdminEvent(
   _event: NewPendingAdmin
 ): void {
-  let account = getOrCreateAccount(_event.params.newPendingAdmin.toHexString());
+  let account = getOrCreateAccount(
+    _event.params.newPendingAdmin.toHexString(),
+    _event.block.timestamp
+  );
 
   createOrUpdateGlobal('pendingAdmin', account.id);
 
