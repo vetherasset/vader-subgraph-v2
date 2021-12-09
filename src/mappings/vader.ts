@@ -26,7 +26,12 @@ import {
   initConstants,
   setUntaxed,
   createOrUpdateXVaderPrice,
+  VADER_ADDRESS,
+  CONVERTER,
+  LINEAR_VESTING,
+  SEED_LIQUIDITY,
   XVADER_ADDRESS,
+  getOrCreateBalance,
 } from "./common";
 import { Address } from "@graphprotocol/graph-ts";
 
@@ -61,6 +66,20 @@ export function handleTransferEvent(
     _event.params.to.toHexString(),
     _event.params.value,
     _event.block.timestamp
+  );
+
+  let token = getOrCreateToken(VADER_ADDRESS);
+  let balanceInVader = getOrCreateBalance(VADER_ADDRESS, VADER_ADDRESS);
+  let balanceInConverter = getOrCreateBalance(CONVERTER, VADER_ADDRESS);
+  let balanceInVesting = getOrCreateBalance(LINEAR_VESTING, VADER_ADDRESS);
+  let balanceInSeed = getOrCreateBalance(SEED_LIQUIDITY, VADER_ADDRESS);
+  createOrUpdateGlobal(
+    "circulatingSupply",
+    token.totalSupply
+      .minus(balanceInVader.balance)
+      .minus(balanceInConverter.balance)
+      .minus(balanceInVesting.balance)
+      .minus(balanceInSeed.balance).toString()
   );
 
   let xvaderAddress = Address.fromString(XVADER_ADDRESS);
