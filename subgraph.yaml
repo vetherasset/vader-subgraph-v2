@@ -76,6 +76,35 @@ dataSources:
           handler: handleTransferEvent
       file: ./src/mappings/usdv.ts
 
+  # ======================= BOND LP ========================
+  - kind: ethereum/contract
+    name: BONDLP
+    network: kovan
+    source:
+      address: "0x38F19a5452B03262203cAe9532Fbfd211fa32FF1"
+      abi: ERC20
+      startBlock: 28674741
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+        - Token
+        - Account
+        - Allowance
+        - Transaction
+        - ApprovalEvent
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalEvent
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferEvent
+      file: ./src/mappings/erc20.ts
+
   # ====================== Converter ======================
   - kind: ethereum/contract
     name: Converter
