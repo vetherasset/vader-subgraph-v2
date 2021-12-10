@@ -20,6 +20,9 @@ import {
   TransferEvent,
   Vest,
   VetoStatus,
+  Terms,
+  Bond,
+  Adjust,
 } from "../../generated/schema";
 
 export let ZERO = BigInt.fromI32(0);
@@ -50,6 +53,8 @@ export let CONVERTER = '0x0000000000000000000000000000000000000000';
 export let LINEAR_VESTING = '0x0000000000000000000000000000000000000000';
 export let XVADER_ADDRESS = '0x0aa1056ee563c14484fcc530625ca74575c97512';
 export let SEED_LIQUIDITY = '0x0000000000000000000000000000000000000000';
+export let VADER_BOND_ADDRESS = '0x66BcC1c537509bA441ccc9DF39E18CC142C59775';
+export let TREASURY_ADDRESS = '0x15d89713eA5C46dE381C51A34fE4C743677576B4';
 
 export function initConstants(): void {
   createOrUpdateGlobal('INITIAL_VADER_SUPPLY', INITIAL_VADER_SUPPLY.toString());
@@ -166,6 +171,7 @@ export function getOrCreateAccount(
     account.index = BigInt.fromString(global.value).toI32();
     account.address = Address.fromString(_address);
     account.isUntaxed = false;
+    account.isBondContract = false;
     account.save();
 
     global.value = BigInt.fromString(global.value).plus(ONE).toString();
@@ -584,4 +590,50 @@ export function getBondTypeFromIndex(
     return "DEBT";
   }
   return "";
+}
+
+export function getOrCreateTerms(): Terms {
+  let terms = Terms.load("Terms");
+
+  if (!terms) {
+    terms.controlVariable = ZERO;
+    terms.vestingTerm = ZERO;
+    terms.minPrice = ZERO;
+    terms.maxPayout = ZERO;
+    terms.maxDebt = ZERO;
+    terms.save();
+  }
+
+  return terms as Terms;
+}
+
+export function getOrCreateBond(
+  _address: string
+): Bond {
+  let bond = Bond.load(_address);
+
+  if (!bond) {
+    bond.account = _address;
+    bond.payout = ZERO;
+    bond.vesting = ZERO;
+    bond.lastBlock = ZERO;
+    bond.save();
+  }
+
+  return bond as Bond;
+}
+
+export function getOrCreateAdjust(): Adjust {
+  let adjust = Adjust.load("Adjust");
+
+  if (!adjust) {
+    adjust.add = false;
+    adjust.rate = ZERO;
+    adjust.target = ZERO;
+    adjust.buffer = ZERO;
+    adjust.lastBlock = ZERO;
+    adjust.save();
+  }
+
+  return adjust as Adjust;
 }

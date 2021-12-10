@@ -19,6 +19,8 @@ export function handleSetBondContractEvent(
     _event.params.bond.toHexString(),
     _event.block.timestamp
   );
+  bondContract.isBondContract = _event.params.approved;
+  bondContract.save();
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetBondContractEvent(eventId);

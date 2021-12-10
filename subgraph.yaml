@@ -314,6 +314,9 @@ dataSources:
           handler: handleSetAdjustmentEvent
         - event: TreasuryChanged(address)
           handler: handleTreasuryChangedEvent
+      callHandlers:
+        - function: deposit(uint256,uint256,address)
+          handler: handleDeposit
       file: ./src/mappings/vaderBond.ts
 
   # ==================== LinearVesting ====================

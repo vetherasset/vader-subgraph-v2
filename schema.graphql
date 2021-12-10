@@ -52,6 +52,8 @@ type Account @entity {
   address: Bytes!
   updatedAt: Int
   isUntaxed: Boolean!
+  isBondContract: Boolean!
+  bond: [Bond]! @derivedFrom(field: "account")
   token: [Balance]! @derivedFrom(field: "account")
   nft: [NFTItem]! @derivedFrom(field: "owner")
   allowance: [Allowance]! @derivedFrom(field: "owner")
@@ -300,6 +302,32 @@ type WithdrawEvent @entity {
 }
 
 # ===================== VaderBond ========================
+type Terms @entity {
+  id: ID!
+  controlVariable: BigInt!
+  vestingTerm: BigInt!
+  minPrice: BigInt!
+  maxPayout: BigInt!
+  maxDebt: BigInt!
+}
+
+type Adjust @entity {
+  id: ID!
+  add: Boolean!
+  rate: BigInt!
+  target: BigInt!
+  buffer: BigInt!
+  lastBlock: BigInt!
+}
+
+type Bond @entity {
+  id: ID!
+  account: Account!
+  payout: BigInt!
+  vesting: BigInt!
+  lastBlock: BigInt!
+}
+
 type BondCreatedEvent @entity {
   id: ID!
   deposit: BigInt!
