@@ -44,7 +44,7 @@ export function handleDeposit(
     Address.fromString(VADER_BOND_ADDRESS)
   );
   let treasuryContract = Treasury.bind(
-    Address.fromString(TREASURY_ADDRESS)
+    Address.fromString(getOrCreateGlobal("treasury").value)
   );
   let value = treasuryContract.valueOfToken(
     vaderBondContract.principalToken(), _call.inputs._amount
@@ -114,7 +114,10 @@ export function handleBondRedeemedEvent(
 export function handleBondPriceChangedEvent(
   _event: BondPriceChanged
 ): void {
-  let price = getOrCreateGlobal("bondPrice");
+  let price = getOrCreateGlobal(
+    "bondPrice",
+    _event.block.timestamp
+  );
   createOrUpdateGlobal(
     "bondPrice",
     _event.params.internalPrice.toString(),

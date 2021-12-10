@@ -299,6 +299,8 @@ dataSources:
       abis:
         - name: VaderBond
           file: ./abis/VaderBond.json
+        - name: Treasury
+          file: ./abis/Treasury.json
       eventHandlers:
         - event: BondCreated(uint256,uint256,uint256)
           handler: handleBondCreatedEvent
