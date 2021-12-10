@@ -78,7 +78,9 @@ type Account @entity {
   positionOpenedToEvent: [PositionOpenedEvent]! @derivedFrom(field: "to")
   positionClosedEvent: [PositionClosedEvent]! @derivedFrom(field: "sender")
   proposalCreatedEvent: [ProposalCreatedEvent]! @derivedFrom(field: "proposer")
+  setBondContractEvent: [SetBondContractEvent]! @derivedFrom(field: "bond")
   treasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "treasury")
+  withdrawEvent: [WithdrawEvent]! @derivedFrom(field: "destination")
   approveOwnerEvent: [ApprovalEvent]! @derivedFrom(field: "owner")
   approveSpenderEvent: [ApprovalEvent]! @derivedFrom(field: "spender")
   receiveEvent: [TransferEvent]! @derivedFrom(field: "to")
@@ -104,6 +106,7 @@ type Token @entity {
   pairInfo: [PairInfo]! @derivedFrom(field: "foreignAsset")
   swapEvent: [SwapEvent]! @derivedFrom(field: "foreignAsset")
   syncEvent: [SyncEvent]! @derivedFrom(field: "foreignAsset")
+  withdrawEvent: [WithdrawEvent]! @derivedFrom(field: "token")
   transferEvent: [TransferEvent]! @derivedFrom(field: "token")
   approvalEvent: [ApprovalEvent]! @derivedFrom(field: "token")
 }
@@ -280,6 +283,20 @@ type SyncEvent @entity {
   foreignAsset: Token!
   reserve0: BigInt!
   reserve1: BigInt!
+}
+
+# ===================== Treasury =========================
+type SetBondContractEvent @entity {
+  id: ID!
+  bond: Account!
+  approved: Boolean!
+}
+
+type WithdrawEvent @entity {
+  id: ID!
+  token: Token!
+  destination: Account!
+  amount: BigInt!
 }
 
 # ===================== VaderBond ========================

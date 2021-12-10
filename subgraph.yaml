@@ -258,6 +258,30 @@ dataSources:
           handler: handleLeave
       file: ./src/mappings/xvader.ts
 
+  # ======================== Treasury ========================
+  - kind: ethereum/contract
+    name: Treasury
+    network: kovan
+    source:
+      address: "0x15d89713eA5C46dE381C51A34fE4C743677576B4"
+      abi: Treasury
+      startBlock: 28674805
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - token
+      abis:
+        - name: Treasury
+          file: ./abis/Treasury.json
+      eventHandlers:
+        - event: SetBondContract(address,bool)
+          handler: handleSetBondContractEvent
+        - event: Withdraw(indexed address,indexed address,uint256)
+          handler: handleWithdrawEvent
+      file: ./src/mappings/treasury.ts
+
   # ======================= VaderBond ========================
   - kind: ethereum/contract
     name: VaderBond
@@ -271,7 +295,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - XVaderPrice
+        - token
       abis:
         - name: VaderBond
           file: ./abis/VaderBond.json
