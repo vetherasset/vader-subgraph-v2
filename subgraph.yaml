@@ -180,7 +180,7 @@ dataSources:
           handler: handleSetTokenSupport
       file: ./src/mappings/vaderPoolV2.ts
 
-    # ====================== SynthFactory =======================
+  # ====================== SynthFactory =======================
   - kind: ethereum/contract
     name: SynthFactory
     network: kovan
@@ -202,7 +202,7 @@ dataSources:
           handler: handleCreateSynth
       file: ./src/mappings/synthFactory.ts
 
-    # ====================== XVaderPrice =======================
+  # ======================== XVader ==========================
   - kind: ethereum/contract
     name: XVader
     network: kovan
@@ -228,6 +228,40 @@ dataSources:
         - function: leave(uint256)
           handler: handleLeave
       file: ./src/mappings/xvader.ts
+
+  # ======================= VaderBond ========================
+  - kind: ethereum/contract
+    name: VaderBond
+    network: kovan
+    source:
+      address: "0x66BcC1c537509bA441ccc9DF39E18CC142C59775"
+      abi: VaderBond
+      startBlock: 28674821
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - XVaderPrice
+      abis:
+        - name: VaderBond
+          file: ./abis/VaderBond.json
+      eventHandlers:
+        - event: BondCreated(uint256,uint256,uint256)
+          handler: handleBondCreatedEvent
+        - event: BondRedeemed(indexed address,uint256,uint256)
+          handler: handleBondRedeemedEvent
+        - event: BondPriceChanged(uint256,uint256)
+          handler: handleBondPriceChangedEvent
+        - event: ControlVariableAdjustment(uint256,uint256,uint256,bool)
+          handler: handleControlVariableAdjustmentEvent
+        - event: SetBondTerms(indexed uint8,uint256)
+          handler: handleSetBondTermsEvent
+        - event: SetAdjustment(bool,uint256,uint256,uint256)
+          handler: handleSetAdjustmentEvent
+        - event: TreasuryChanged(address)
+          handler: handleTreasuryChangedEvent
+      file: ./src/mappings/vaderBond.ts
 
   # ==================== LinearVesting ====================
   - kind: ethereum/contract

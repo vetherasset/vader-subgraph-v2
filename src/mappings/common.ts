@@ -572,3 +572,16 @@ export function createOrUpdateXVaderPrice(
     true
   );
 }
+
+export function getBondTypeFromIndex(
+  _param: i32
+): string {
+  if (_param == 0) {
+    return "VESTING";
+  } else if (_param == 1) {
+    return "PAYOUT";
+  } else if (_param == 2) {
+    return "DEBT";
+  }
+  return "";
+}

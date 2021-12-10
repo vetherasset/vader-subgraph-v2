@@ -17,6 +17,12 @@ enum ProposalState {
   Executed
 }
 
+enum BondParameter {
+  VESTING,
+  PAYOUT,
+  DEBT
+}
+
 type Global @entity {
   id: ID!
   name: String!
@@ -56,6 +62,8 @@ type Account @entity {
   mintSenderEvent: [MintEvent]! @derivedFrom(field: "sender")
   mintToEvent: [MintEvent]! @derivedFrom(field: "to")
   proposal: [Proposal]! @derivedFrom(field: "proposer")
+  receipt: [Receipt]! @derivedFrom(field: "voter")
+  bondRedeemedEvent: [BondRedeemedEvent]! @derivedFrom(field: "recipient")
   conversionEvent: [ConversionEvent]! @derivedFrom(field: "user")
   councilChangedOldEvent: [CouncilChangedEvent]! @derivedFrom(field: "oldCouncil")
   councilChangedNewEvent: [CouncilChangedEvent]! @derivedFrom(field: "newCouncil")
@@ -70,7 +78,7 @@ type Account @entity {
   positionOpenedToEvent: [PositionOpenedEvent]! @derivedFrom(field: "to")
   positionClosedEvent: [PositionClosedEvent]! @derivedFrom(field: "sender")
   proposalCreatedEvent: [ProposalCreatedEvent]! @derivedFrom(field: "proposer")
-  receipt: [Receipt]! @derivedFrom(field: "voter")
+  treasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "treasury")
   approveOwnerEvent: [ApprovalEvent]! @derivedFrom(field: "owner")
   approveSpenderEvent: [ApprovalEvent]! @derivedFrom(field: "spender")
   receiveEvent: [TransferEvent]! @derivedFrom(field: "to")
@@ -272,6 +280,54 @@ type SyncEvent @entity {
   foreignAsset: Token!
   reserve0: BigInt!
   reserve1: BigInt!
+}
+
+# ===================== VaderBond ========================
+type BondCreatedEvent @entity {
+  id: ID!
+  deposit: BigInt!
+  payout: BigInt!
+  expires: BigInt!
+}
+
+type BondRedeemedEvent @entity {
+  id: ID!
+  recipient: Account!
+  payout: BigInt!
+  remaining: BigInt!
+}
+
+type BondPriceChangedEvent @entity {
+  id: ID!
+  internalPrice: BigInt!
+  debtRatio: BigInt!
+}
+
+type ControlVariableAdjustmentEvent @entity {
+  id: ID!
+  initialBCV: BigInt!
+  newBCV: BigInt!
+  adjustment: BigInt!
+  addition: Boolean!
+}
+
+type SetBondTermsEvent @entity {
+  id: ID!
+  param: BondParameter!
+  input: BigInt!
+}
+
+type SetAdjustmentEvent @entity {
+  id: ID!
+  add: Boolean!
+  rate: BigInt!
+  target: BigInt!
+  buffer: BigInt!
+}
+
+type TreasuryChangedEvent @entity {
+  id: ID!
+  treasury: Account!
 }
 
 # =================== LinearVesting ======================
