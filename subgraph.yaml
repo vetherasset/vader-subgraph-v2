@@ -317,6 +317,8 @@ dataSources:
         - event: TreasuryChanged(address)
           handler: handleTreasuryChangedEvent
       callHandlers:
+        - function: initializeBond(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleInitializeBond
         - function: deposit(uint256,uint256,address)
           handler: handleDeposit
       file: ./src/mappings/vaderBond.ts

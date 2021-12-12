@@ -593,11 +593,14 @@ export function getBondTypeFromIndex(
   return "";
 }
 
-export function getOrCreateTerms(): Terms {
-  let terms = Terms.load("Terms");
+export function getOrCreateTerms(
+  _address: string
+): Terms {
+  let terms = Terms.load(_address);
 
   if (!terms) {
-    terms = new Terms("Terms");
+    terms = new Terms(_address);
+    terms.bond = _address;
     terms.controlVariable = ZERO;
     terms.vestingTerm = ZERO;
     terms.minPrice = ZERO;
@@ -610,13 +613,15 @@ export function getOrCreateTerms(): Terms {
 }
 
 export function getOrCreateBond(
-  _address: string
+  _address: string,
+  _depositor: string
 ): Bond {
-  let bond = Bond.load(_address);
+  let bond = Bond.load(_address + "_" + _depositor);
 
   if (!bond) {
     bond = new Bond(_address);
-    bond.account = _address;
+    bond.bond = _address;
+    bond.depositor = _depositor;
     bond.payout = ZERO;
     bond.vesting = ZERO;
     bond.lastBlock = ZERO;
@@ -626,11 +631,14 @@ export function getOrCreateBond(
   return bond as Bond;
 }
 
-export function getOrCreateAdjust(): Adjust {
-  let adjust = Adjust.load("Adjust");
+export function getOrCreateAdjust(
+  _address: string
+): Adjust {
+  let adjust = Adjust.load(_address);
 
   if (!adjust) {
-    adjust = new Adjust("Adjust");
+    adjust = new Adjust(_address);
+    adjust.bond = _address;
     adjust.add = false;
     adjust.rate = ZERO;
     adjust.target = ZERO;

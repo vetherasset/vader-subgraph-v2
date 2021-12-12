@@ -12,6 +12,7 @@ import {
   TreasuryChanged,
   VaderBond,
   DepositCall,
+  InitializeBondCall,
 } from "../../generated/VaderBond/VaderBond";
 import {
   BondCreatedEvent,
@@ -31,30 +32,75 @@ import {
   getOrCreateBond,
   getOrCreateGlobal,
   getOrCreateTerms,
-  TREASURY_ADDRESS,
   VADER_BOND_ADDRESS,
   ZERO
 } from "./common";
 import { Treasury } from "../../generated/Treasury/Treasury";
 
+export function handleInitializeBond(
+  _call: InitializeBondCall
+): void {
+  let account = getOrCreateAccount(_call.to.toHexString());
+  let vaderBondContract = VaderBond.bind(
+    Address.fromString(account.id)
+  );
+
+  createOrUpdateGlobal(
+    account.id + "_treasury",
+    vaderBondContract.treasury().toHexString()
+  );
+  createOrUpdateGlobal(
+    account.id + "_payoutToken",
+    vaderBondContract.payoutToken().toHexString()
+  );
+  createOrUpdateGlobal(
+    account.id + "_principalToken",
+    vaderBondContract.principalToken().toHexString()
+  );
+  createOrUpdateGlobal(
+    account.id + "totalDebt",
+    _call.inputs._initialDebt.toString(),
+    _call.block.timestamp,
+    _call.inputs._initialDebt,
+    true
+  );
+  createOrUpdateGlobal(
+    account.id + "lastDecay",
+    _call.block.number.toString()
+  );
+
+  let terms = getOrCreateTerms(account.id);
+  terms.controlVariable = _call.inputs._controlVariable;
+  terms.vestingTerm = _call.inputs._vestingTerm;
+  terms.minPrice = _call.inputs._minPrice;
+  terms.maxPayout = _call.inputs._maxPayout;
+  terms.maxDebt = _call.inputs._maxDebt;
+  terms.save();
+}
+
 export function handleDeposit(
   _call: DepositCall
 ): void {
+  let account = getOrCreateAccount(_call.to.toHexString());
   let vaderBondContract = VaderBond.bind(
-    Address.fromString(VADER_BOND_ADDRESS)
+    Address.fromString(account.id)
   );
   let treasuryContract = Treasury.bind(
-    Address.fromString(getOrCreateGlobal("treasury").value)
+    vaderBondContract.treasury()
   );
   let value = treasuryContract.valueOfToken(
     vaderBondContract.principalToken(), _call.inputs._amount
   );
 
   createOrUpdateGlobal(
-    "totalDebt",
+    account.id + "_totalDebt",
     value.toString(),
     _call.block.timestamp,
     value,
+  );
+  createOrUpdateGlobal(
+    account.id + "_lastDecay",
+    _call.block.number.toString()
   );
 
   let depositor = getOrCreateAccount(
@@ -62,8 +108,8 @@ export function handleDeposit(
     _call.block.timestamp
   );
 
-  let terms = getOrCreateTerms();
-  let bondInfo = getOrCreateBond(depositor.id);
+  let terms = getOrCreateTerms(account.id);
+  let bondInfo = getOrCreateBond(account.id, depositor.id);
   bondInfo.payout = bondInfo.payout.plus(_call.outputs.value0);
   bondInfo.vesting = terms.vestingTerm;
   bondInfo.lastBlock = _call.block.number;
@@ -79,8 +125,11 @@ export function handleDeposit(
 export function handleBondCreatedEvent(
   _event: BondCreated
 ): void {
+  let account = getOrCreateAccount(_event.address.toHexString());
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new BondCreatedEvent(eventId);
+  event.bond = account.id;
   event.deposit = _event.params.deposit;
   event.payout = _event.params.payout;
   event.expires = _event.params.expires;
@@ -90,12 +139,14 @@ export function handleBondCreatedEvent(
 export function handleBondRedeemedEvent(
   _event: BondRedeemed
 ): void {
-  let account = getOrCreateAccount(
+  let account = getOrCreateAccount(_event.address.toHexString());
+
+  let depositor = getOrCreateAccount(
     _event.params.recipient.toHexString(),
     _event.block.timestamp
   );
 
-  let bondInfo = getOrCreateBond(account.id);
+  let bondInfo = getOrCreateBond(account.id, depositor.id);
   bondInfo.payout = _event.params.remaining;
   bondInfo.vesting = bondInfo.vesting.minus(
     _event.block.number.minus(bondInfo.lastBlock)
@@ -105,7 +156,8 @@ export function handleBondRedeemedEvent(
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new BondRedeemedEvent(eventId);
-  event.recipient = account.id;
+  event.bond = account.id;
+  event.recipient = depositor.id;
   event.payout = _event.params.payout;
   event.remaining = _event.params.remaining;
   event.save();
@@ -114,12 +166,14 @@ export function handleBondRedeemedEvent(
 export function handleBondPriceChangedEvent(
   _event: BondPriceChanged
 ): void {
+  let account = getOrCreateAccount(_event.address.toHexString());
+
   let price = getOrCreateGlobal(
-    "bondPrice",
+    account.id + "_bondPrice",
     _event.block.timestamp
   );
   createOrUpdateGlobal(
-    "bondPrice",
+    account.id + "_bondPrice",
     _event.params.internalPrice.toString(),
     _event.block.timestamp,
     _event.params.internalPrice.minus(BigInt.fromString(price.value)),
@@ -128,6 +182,7 @@ export function handleBondPriceChangedEvent(
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new BondPriceChangedEvent(eventId);
+  event.bond = account.id;
   event.internalPrice = _event.params.internalPrice;
   event.debtRatio = _event.params.debtRatio;
   event.save();
@@ -136,17 +191,20 @@ export function handleBondPriceChangedEvent(
 export function handleControlVariableAdjustmentEvent(
   _event: ControlVariableAdjustment
 ): void {
-  let terms = getOrCreateTerms();
+  let account = getOrCreateAccount(_event.address.toHexString());
+
+  let terms = getOrCreateTerms(account.id);
   terms.controlVariable = _event.params.newBCV;
   terms.save();
 
-  let adjust = getOrCreateAdjust();
+  let adjust = getOrCreateAdjust(account.id);
   adjust.rate = _event.params.adjustment;
   adjust.lastBlock = _event.block.number;
   adjust.save();
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new ControlVariableAdjustmentEvent(eventId);
+  event.bond = account.id;
   event.initialBCV = _event.params.initialBCV;
   event.newBCV = _event.params.newBCV;
   event.adjustment = _event.params.adjustment;
@@ -157,9 +215,10 @@ export function handleControlVariableAdjustmentEvent(
 export function handleSetBondTermsEvent(
   _event: SetBondTerms
 ): void {
+  let account = getOrCreateAccount(_event.address.toHexString());
   let bondType = getBondTypeFromIndex(_event.params.param);
   let input = _event.params.input;
-  let terms = getOrCreateTerms();
+  let terms = getOrCreateTerms(account.id);
 
   if (bondType == "VESTING") {
     terms.vestingTerm = input;
@@ -172,6 +231,7 @@ export function handleSetBondTermsEvent(
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetBondTermsEvent(eventId);
+  event.bond = account.id;
   event.param = bondType;
   event.input = input;
   event.save();
@@ -180,7 +240,9 @@ export function handleSetBondTermsEvent(
 export function handleSetAdjustmentEvent(
   _event: SetAdjustment
 ): void {
-  let adjust = getOrCreateAdjust();
+  let account = getOrCreateAccount(_event.address.toHexString());
+
+  let adjust = getOrCreateAdjust(account.id);
   adjust.add = _event.params.add;
   adjust.rate = _event.params.rate;
   adjust.target = _event.params.target;
@@ -190,6 +252,7 @@ export function handleSetAdjustmentEvent(
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetAdjustmentEvent(eventId);
+  event.bond = account.id;
   event.add = _event.params.add;
   event.rate = _event.params.rate;
   event.target = _event.params.target;
@@ -200,15 +263,20 @@ export function handleSetAdjustmentEvent(
 export function handleTreasuryChangedEvent(
   _event: TreasuryChanged
 ): void {
-  let account = getOrCreateAccount(
+  let account = getOrCreateAccount(_event.address.toHexString());
+  let treasury = getOrCreateAccount(
     _event.params.treasury.toHexString(),
     _event.block.timestamp
   );
 
-  createOrUpdateGlobal("treasury", account.id);
+  createOrUpdateGlobal(
+    _event.address.toHexString() + "_treasury",
+    treasury.id
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new TreasuryChangedEvent(eventId);
-  event.treasury = account.id;
+  event.bond = account.id;
+  event.treasury = treasury.id;
   event.save();
 }

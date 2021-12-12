@@ -53,19 +53,29 @@ type Account @entity {
   updatedAt: Int
   isUntaxed: Boolean!
   isBondContract: Boolean!
-  bond: [Bond]! @derivedFrom(field: "account")
   token: [Balance]! @derivedFrom(field: "account")
   nft: [NFTItem]! @derivedFrom(field: "owner")
   allowance: [Allowance]! @derivedFrom(field: "owner")
   nftAllowance: [NFTAllowance]! @derivedFrom(field: "owner")
   vest: [Vest]! @derivedFrom(field: "account")
+  bondInfo: [Bond]! @derivedFrom(field: "bond")
+  bondDepositorInfo: [Bond]! @derivedFrom(field: "depositor")
+  bondTerms: [Terms]! @derivedFrom(field: "bond")
+  bondAdjust: [Adjust]! @derivedFrom(field: "bond")
   burnSenderEvent: [BurnEvent]! @derivedFrom(field: "sender")
   burnToEvent: [BurnEvent]! @derivedFrom(field: "to")
   mintSenderEvent: [MintEvent]! @derivedFrom(field: "sender")
   mintToEvent: [MintEvent]! @derivedFrom(field: "to")
   proposal: [Proposal]! @derivedFrom(field: "proposer")
   receipt: [Receipt]! @derivedFrom(field: "voter")
-  bondRedeemedEvent: [BondRedeemedEvent]! @derivedFrom(field: "recipient")
+  bondCreatedEvent: [BondCreatedEvent]! @derivedFrom(field: "bond")
+  bondRedeemedEvent: [BondRedeemedEvent]! @derivedFrom(field: "bond")
+  bondPriceChangedEvent: [BondPriceChangedEvent]! @derivedFrom(field: "bond")
+  bondControlVariableAdjustmentEvent: [ControlVariableAdjustmentEvent]! @derivedFrom(field: "bond")
+  bondSetBondTermsEvent: [SetBondTermsEvent]! @derivedFrom(field: "bond")
+  bondSetAdjustmentEvent: [SetAdjustmentEvent]! @derivedFrom(field: "bond")
+  bondTreasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "bond")
+  bondRedeemedRecipientEvent: [BondRedeemedEvent]! @derivedFrom(field: "recipient")
   conversionEvent: [ConversionEvent]! @derivedFrom(field: "user")
   councilChangedOldEvent: [CouncilChangedEvent]! @derivedFrom(field: "oldCouncil")
   councilChangedNewEvent: [CouncilChangedEvent]! @derivedFrom(field: "newCouncil")
@@ -304,6 +314,7 @@ type WithdrawEvent @entity {
 # ===================== VaderBond ========================
 type Terms @entity {
   id: ID!
+  bond: Account!
   controlVariable: BigInt!
   vestingTerm: BigInt!
   minPrice: BigInt!
@@ -313,6 +324,7 @@ type Terms @entity {
 
 type Adjust @entity {
   id: ID!
+  bond: Account!
   add: Boolean!
   rate: BigInt!
   target: BigInt!
@@ -322,7 +334,8 @@ type Adjust @entity {
 
 type Bond @entity {
   id: ID!
-  account: Account!
+  bond: Account!
+  depositor: Account!
   payout: BigInt!
   vesting: BigInt!
   lastBlock: BigInt!
@@ -330,6 +343,7 @@ type Bond @entity {
 
 type BondCreatedEvent @entity {
   id: ID!
+  bond: Account!
   deposit: BigInt!
   payout: BigInt!
   expires: BigInt!
@@ -337,6 +351,7 @@ type BondCreatedEvent @entity {
 
 type BondRedeemedEvent @entity {
   id: ID!
+  bond: Account!
   recipient: Account!
   payout: BigInt!
   remaining: BigInt!
@@ -344,12 +359,14 @@ type BondRedeemedEvent @entity {
 
 type BondPriceChangedEvent @entity {
   id: ID!
+  bond: Account!
   internalPrice: BigInt!
   debtRatio: BigInt!
 }
 
 type ControlVariableAdjustmentEvent @entity {
   id: ID!
+  bond: Account!
   initialBCV: BigInt!
   newBCV: BigInt!
   adjustment: BigInt!
@@ -358,12 +375,14 @@ type ControlVariableAdjustmentEvent @entity {
 
 type SetBondTermsEvent @entity {
   id: ID!
+  bond: Account!
   param: BondParameter!
   input: BigInt!
 }
 
 type SetAdjustmentEvent @entity {
   id: ID!
+  bond: Account!
   add: Boolean!
   rate: BigInt!
   target: BigInt!
@@ -372,6 +391,7 @@ type SetAdjustmentEvent @entity {
 
 type TreasuryChangedEvent @entity {
   id: ID!
+  bond: Account!
   treasury: Account!
 }
 
