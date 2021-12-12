@@ -21,7 +21,7 @@ import {
   Vest,
   VetoStatus,
   Terms,
-  Bond,
+  BondInfo,
   Adjust,
 } from "../../generated/schema";
 
@@ -612,23 +612,23 @@ export function getOrCreateTerms(
   return terms as Terms;
 }
 
-export function getOrCreateBond(
+export function getOrCreateBondInfo(
   _address: string,
   _depositor: string
-): Bond {
-  let bond = Bond.load(_address + "_" + _depositor);
+): BondInfo {
+  let bondInfo = BondInfo.load(_address + "_" + _depositor);
 
-  if (!bond) {
-    bond = new Bond(_address);
-    bond.bond = _address;
-    bond.depositor = _depositor;
-    bond.payout = ZERO;
-    bond.vesting = ZERO;
-    bond.lastBlock = ZERO;
-    bond.save();
+  if (!bondInfo) {
+    bondInfo = new BondInfo(_address);
+    bondInfo.bond = _address;
+    bondInfo.depositor = _depositor;
+    bondInfo.payout = ZERO;
+    bondInfo.vesting = ZERO;
+    bondInfo.lastBlock = ZERO;
+    bondInfo.save();
   }
 
-  return bond as Bond;
+  return bondInfo as BondInfo;
 }
 
 export function getOrCreateAdjust(

@@ -7,7 +7,6 @@ import {
   WithdrawEvent
 } from "../../generated/schema";
 import {
-  createOrUpdateGlobal,
   getOrCreateAccount,
   getOrCreateToken
 } from "./common";
@@ -15,6 +14,10 @@ import {
 export function handleSetBondContractEvent(
   _event: SetBondContract
 ): void {
+  let treasury = getOrCreateAccount(
+    _event.address.toHexString(),
+    _event.block.timestamp
+  );
   let bondContract = getOrCreateAccount(
     _event.params.bond.toHexString(),
     _event.block.timestamp
@@ -24,6 +27,7 @@ export function handleSetBondContractEvent(
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetBondContractEvent(eventId);
+  event.treasury = treasury.id;
   event.bond = bondContract.id;
   event.approved = _event.params.approved;
   event.save();
@@ -32,6 +36,10 @@ export function handleSetBondContractEvent(
 export function handleWithdrawEvent(
   _event: Withdraw
 ): void {
+  let treasury = getOrCreateAccount(
+    _event.address.toHexString(),
+    _event.block.timestamp
+  );
   let token = getOrCreateToken(
     _event.params.token.toHexString(),
   );
@@ -42,6 +50,7 @@ export function handleWithdrawEvent(
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new WithdrawEvent(eventId);
+  event.treasury = treasury.id;
   event.token = token.id;
   event.destination = account.id;
   event.amount = _event.params.amount;

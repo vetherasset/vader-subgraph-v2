@@ -58,8 +58,8 @@ type Account @entity {
   allowance: [Allowance]! @derivedFrom(field: "owner")
   nftAllowance: [NFTAllowance]! @derivedFrom(field: "owner")
   vest: [Vest]! @derivedFrom(field: "account")
-  bondInfo: [Bond]! @derivedFrom(field: "bond")
-  bondDepositorInfo: [Bond]! @derivedFrom(field: "depositor")
+  bondInfo: [BondInfo]! @derivedFrom(field: "bond")
+  bondDepositorInfo: [BondInfo]! @derivedFrom(field: "depositor")
   bondTerms: [Terms]! @derivedFrom(field: "bond")
   bondAdjust: [Adjust]! @derivedFrom(field: "bond")
   burnSenderEvent: [BurnEvent]! @derivedFrom(field: "sender")
@@ -72,6 +72,7 @@ type Account @entity {
   bondRedeemedEvent: [BondRedeemedEvent]! @derivedFrom(field: "bond")
   bondPriceChangedEvent: [BondPriceChangedEvent]! @derivedFrom(field: "bond")
   bondControlVariableAdjustmentEvent: [ControlVariableAdjustmentEvent]! @derivedFrom(field: "bond")
+  bondSetBondContractEvent: [SetBondContractEvent]! @derivedFrom(field: "bond")
   bondSetBondTermsEvent: [SetBondTermsEvent]! @derivedFrom(field: "bond")
   bondSetAdjustmentEvent: [SetAdjustmentEvent]! @derivedFrom(field: "bond")
   bondTreasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "bond")
@@ -90,9 +91,10 @@ type Account @entity {
   positionOpenedToEvent: [PositionOpenedEvent]! @derivedFrom(field: "to")
   positionClosedEvent: [PositionClosedEvent]! @derivedFrom(field: "sender")
   proposalCreatedEvent: [ProposalCreatedEvent]! @derivedFrom(field: "proposer")
-  setBondContractEvent: [SetBondContractEvent]! @derivedFrom(field: "bond")
+  treasurySetBondContractEvent: [SetBondContractEvent]! @derivedFrom(field: "treasury")
   treasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "treasury")
-  withdrawEvent: [WithdrawEvent]! @derivedFrom(field: "destination")
+  treasuryWithdrawEvent: [WithdrawEvent]! @derivedFrom(field: "treasury")
+  treasuryWithdrawDestinationEvent: [WithdrawEvent]! @derivedFrom(field: "destination")
   approveOwnerEvent: [ApprovalEvent]! @derivedFrom(field: "owner")
   approveSpenderEvent: [ApprovalEvent]! @derivedFrom(field: "spender")
   receiveEvent: [TransferEvent]! @derivedFrom(field: "to")
@@ -300,12 +302,14 @@ type SyncEvent @entity {
 # ===================== Treasury =========================
 type SetBondContractEvent @entity {
   id: ID!
+  treasury: Account!
   bond: Account!
   approved: Boolean!
 }
 
 type WithdrawEvent @entity {
   id: ID!
+  treasury: Account!
   token: Token!
   destination: Account!
   amount: BigInt!
@@ -332,7 +336,7 @@ type Adjust @entity {
   lastBlock: BigInt!
 }
 
-type Bond @entity {
+type BondInfo @entity {
   id: ID!
   bond: Account!
   depositor: Account!
