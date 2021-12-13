@@ -128,6 +128,7 @@ export function handleBurnEvent(
   event.amount0 = _event.params.amount0;
   event.amount1 = _event.params.amount1;
   event.to = receiver.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -175,6 +176,7 @@ export function handleMintEvent(
   event.amount0 = _event.params.amount0;
   event.amount1 = _event.params.amount1;
   event.to = receiver.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -202,6 +204,7 @@ export function handlePositionOpenedEvent(
   event.to = toAccount.id;
   event.index = _event.params.id;
   event.liquidity = _event.params.liquidity;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -219,6 +222,7 @@ export function handlePositionClosedEvent(
   event.index = _event.params.id;
   event.liquidity = _event.params.liquidity;
   event.loss = _event.params.loss;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -228,6 +232,7 @@ export function handleQueueActiveEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new QueueActiveEvent(eventId);
   event.activated = _event.params.activated;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -253,6 +258,7 @@ export function handleSwapEvent(
   event.amount0Out = _event.params.amount0Out;
   event.amount1Out = _event.params.amount1Out;
   event.to = receiver.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -287,6 +293,7 @@ export function handleSyncEvent(
   event.foreignAsset = token.id;
   event.reserve0 = _event.params.reserve0;
   event.reserve1 = _event.params.reserve1;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 

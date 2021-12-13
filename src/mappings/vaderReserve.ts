@@ -25,6 +25,7 @@ export function handleGrantDistributedEvent(
   let event = new GrantDistributedEvent(eventId);
   event.recipient = account.id;
   event.amount = _event.params.amount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -40,5 +41,6 @@ export function handleLossCoveredEvent(
   let event = new LossCoveredEvent(eventId);
   event.recipient = account.id;
   event.amount = _event.params.amount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

@@ -138,6 +138,7 @@ export function handleBondCreatedEvent(
   event.deposit = _event.params.deposit;
   event.payout = _event.params.payout;
   event.expires = _event.params.expires;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -168,6 +169,7 @@ export function handleBondRedeemedEvent(
   event.recipient = depositor.id;
   event.payout = _event.params.payout;
   event.remaining = _event.params.remaining;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -196,6 +198,7 @@ export function handleBondPriceChangedEvent(
   event.bond = account.id;
   event.internalPrice = _event.params.internalPrice;
   event.debtRatio = _event.params.debtRatio;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -223,6 +226,7 @@ export function handleControlVariableAdjustmentEvent(
   event.newBCV = _event.params.newBCV;
   event.adjustment = _event.params.adjustment;
   event.addition = _event.params.addition;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -251,6 +255,7 @@ export function handleSetBondTermsEvent(
   event.bond = account.id;
   event.param = bondType;
   event.input = input;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -277,6 +282,7 @@ export function handleSetAdjustmentEvent(
   event.rate = _event.params.rate;
   event.target = _event.params.target;
   event.buffer = _event.params.buffer;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -301,5 +307,6 @@ export function handleTreasuryChangedEvent(
   let event = new TreasuryChangedEvent(eventId);
   event.bond = account.id;
   event.treasury = treasury.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

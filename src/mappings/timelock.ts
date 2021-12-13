@@ -39,6 +39,7 @@ export function handleNewAdminEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new NewAdminEvent(eventId);
   event.newAdmin = account.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -55,6 +56,7 @@ export function handleNewPendingAdminEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new NewPendingAdminEvent(eventId);
   event.newPendingAdmin = account.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -66,6 +68,7 @@ export function handleNewDelayEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new NewDelayEvent(eventId);
   event.newDelay = _event.params.newDelay;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -86,6 +89,7 @@ export function handleCancelTransactionEvent(
   event.signature = _event.params.signature;
   event.data = _event.params.data;
   event.eta = _event.params.eta;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -106,6 +110,7 @@ export function handleExecuteTransactionEvent(
   event.signature = _event.params.signature;
   event.data = _event.params.data;
   event.eta = _event.params.eta;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -127,6 +132,7 @@ export function handleQueueTransactionEvent(
   event.signature = _event.params.signature;
   event.data = _event.params.data;
   event.eta = _event.params.eta;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 

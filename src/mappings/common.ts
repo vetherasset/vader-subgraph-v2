@@ -415,6 +415,7 @@ export function createApprovalEvent(
   approval.owner = ownerAccount.id;
   approval.spender = spenderAccount.id;
   approval.amount = _value;
+  approval.timestamp = _timestamp.toI32();
   approval.save();
 
   return approval as ApprovalEvent;
@@ -547,6 +548,7 @@ export function createTransferEvent(
   transferEvent.from = _from;
   transferEvent.to = _to;
   transferEvent.value = _value;
+  transferEvent.timestamp = _timestamp.toI32();
   transferEvent.save();
 }
 

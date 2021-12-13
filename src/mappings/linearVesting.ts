@@ -34,6 +34,7 @@ export function handleVestedEvent(
   let event = new VestedEvent(eventId);
   event.from = account.id;
   event.amount = _event.params.amount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -56,6 +57,7 @@ export function handleVestingCreatedEvent(
   let event = new VestingCreatedEvent(eventId);
   event.user = account.id;
   event.amount = _event.params.amount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -74,5 +76,6 @@ export function handleVestingInitializedEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new VestingInitializedEvent(eventId);
   event.duration = _event.params.duration;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

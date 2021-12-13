@@ -15,5 +15,6 @@ export function handleConversionEvent(
   event.user = account.id;
   event.vetherAmount = _event.params.vetherAmount;
   event.vaderAmount = _event.params.vaderAmount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

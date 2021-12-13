@@ -100,6 +100,7 @@ export function handleEmissionEvent(
   let event = new EmissionEvent(eventId);
   event.amount = _event.params.amount;
   event.lastEmission = _event.params.lastEmission;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -112,6 +113,7 @@ export function handleEmissionChangedEvent(
   let event = new EmissionChangedEvent(eventId);
   event.previous = _event.params.previous;
   event.next = _event.params.next;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -127,6 +129,7 @@ export function handleGrantClaimedEvent(
   let event = new GrantClaimedEvent(eventId);
   event.beneficiary = account.id;
   event.amount = _event.params.amount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -139,6 +142,7 @@ export function handleMaxSupplyChangedEvent(
   let event = new MaxSupplyChangedEvent(eventId);
   event.previous = _event.params.previous;
   event.next = _event.params.next;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -164,5 +168,6 @@ export function handleProtocolInitializedEvent(
   event.vest = vest.id;
   event.usdv = usdv.id;
   event.dao = dao;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

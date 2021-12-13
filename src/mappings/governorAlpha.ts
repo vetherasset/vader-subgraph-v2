@@ -47,6 +47,7 @@ export function handleCouncilChangedEvent(
   let event = new CouncilChangedEvent(eventId);
   event.oldCouncil = oldCouncil.id;
   event.newCouncil = newCouncil.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -68,6 +69,7 @@ export function handleFeeReceiverChangedEvent(
   let event = new FeeReceiverChangedEvent(eventId);
   event.oldFeeReceiver = oldFeeReceiver.id;
   event.newFeeReceiver = newFeeReceiver.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -80,6 +82,7 @@ export function handleFeeAmountChangedEvent(
   let event = new FeeAmountChangedEvent(eventId);
   event.oldFeeAmount = _event.params.oldFeeAmount;
   event.newFeeAmount = _event.params.newFeeAmount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -112,6 +115,7 @@ export function handleProposalCreatedEvent(
   event.startBlock = _event.params.startBlock;
   event.endBlock = _event.params.endBlock;
   event.description = _event.params.description;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -125,6 +129,7 @@ export function handleProposalCanceledEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new ProposalCanceledEvent(eventId);
   event.proposalId = _event.params.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -139,6 +144,7 @@ export function handleProposalQueuedEvent(
   let event = new ProposalQueuedEvent(eventId);
   event.proposalId = _event.params.id;
   event.eta = _event.params.eta;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -152,6 +158,7 @@ export function handleProposalExecutedEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new ProposalExecutedEvent(eventId);
   event.proposalId = _event.params.id;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -171,6 +178,7 @@ export function handleProposalVetoedEvent(
   let event = new ProposalVetoedEvent(eventId);
   event.proposalId = _event.params.proposalId;
   event.support = _event.params.support;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -194,5 +202,6 @@ export function handleVoteCastEvent(
   event.proposalId = _event.params.proposalId;
   event.support = _event.params.support;
   event.votes = _event.params.votes;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

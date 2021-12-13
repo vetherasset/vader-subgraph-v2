@@ -30,6 +30,7 @@ export function handleSetBondContractEvent(
   event.treasury = treasury.id;
   event.bond = bondContract.id;
   event.approved = _event.params.approved;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
 
@@ -54,5 +55,6 @@ export function handleWithdrawEvent(
   event.token = token.id;
   event.destination = account.id;
   event.amount = _event.params.amount;
+  event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }

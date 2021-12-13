@@ -131,6 +131,7 @@ type ApprovalEvent @entity {
   owner: Account!
   spender: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 type TransferEvent @entity {
@@ -139,6 +140,7 @@ type TransferEvent @entity {
   from: Account!
   to: Account!
   value: BigInt!
+  timestamp: Int
 }
 
 # ======================== Vader ========================
@@ -146,24 +148,28 @@ type EmissionEvent @entity {
   id: ID!
   amount: BigInt!
   lastEmission: BigInt!
+  timestamp: Int
 }
 
 type EmissionChangedEvent @entity {
   id: ID!
   previous: BigInt!
   next: BigInt!
+  timestamp: Int
 }
 
 type GrantClaimedEvent @entity {
   id: ID!
   beneficiary: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 type MaxSupplyChangedEvent @entity {
   id: ID!
   previous: BigInt!
   next: BigInt!
+  timestamp: Int
 }
 
 type ProtocolInitializedEvent @entity {
@@ -172,6 +178,7 @@ type ProtocolInitializedEvent @entity {
   vest: Token!
   usdv: Token!
   dao: Bytes!
+  timestamp: Int
 }
 
 # ======================== USDV =========================
@@ -182,6 +189,7 @@ type ConversionEvent @entity {
   user: Account!
   vetherAmount: BigInt!
   vaderAmount: BigInt!
+  timestamp: Int
 }
 
 # ==================== VaderReserve ======================
@@ -189,12 +197,14 @@ type GrantDistributedEvent @entity {
   id: ID!
   recipient: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 type LossCoveredEvent @entity {
   id: ID!
   recipient: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 # ===================== VaderPoolV2 ========================
@@ -250,6 +260,7 @@ type BurnEvent @entity {
   amount0: BigInt!
   amount1: BigInt!
   to: Account!
+  timestamp: Int
 }
 
 type MintEvent @entity {
@@ -258,6 +269,7 @@ type MintEvent @entity {
   to: Account!
   amount0: BigInt!
   amount1: BigInt!
+  timestamp: Int
 }
 
 type PositionOpenedEvent @entity {
@@ -266,6 +278,7 @@ type PositionOpenedEvent @entity {
   to: Account!
   index: BigInt!
   liquidity: BigInt!
+  timestamp: Int
 }
 
 type PositionClosedEvent @entity {
@@ -274,11 +287,13 @@ type PositionClosedEvent @entity {
   index: BigInt!
   liquidity: BigInt!
   loss: BigInt!
+  timestamp: Int
 }
 
 type QueueActiveEvent @entity {
   id: ID!
   activated: Boolean!
+  timestamp: Int
 }
 
 type SwapEvent @entity {
@@ -290,6 +305,7 @@ type SwapEvent @entity {
   amount0Out: BigInt!
   amount1Out: BigInt!
   to: Account!
+  timestamp: Int
 }
 
 type SyncEvent @entity {
@@ -297,6 +313,7 @@ type SyncEvent @entity {
   foreignAsset: Token!
   reserve0: BigInt!
   reserve1: BigInt!
+  timestamp: Int
 }
 
 # ===================== Treasury =========================
@@ -305,6 +322,7 @@ type SetBondContractEvent @entity {
   treasury: Account!
   bond: Account!
   approved: Boolean!
+  timestamp: Int
 }
 
 type WithdrawEvent @entity {
@@ -313,6 +331,7 @@ type WithdrawEvent @entity {
   token: Token!
   destination: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 # ===================== VaderBond ========================
@@ -351,6 +370,7 @@ type BondCreatedEvent @entity {
   deposit: BigInt!
   payout: BigInt!
   expires: BigInt!
+  timestamp: Int
 }
 
 type BondRedeemedEvent @entity {
@@ -359,6 +379,7 @@ type BondRedeemedEvent @entity {
   recipient: Account!
   payout: BigInt!
   remaining: BigInt!
+  timestamp: Int
 }
 
 type BondPriceChangedEvent @entity {
@@ -366,6 +387,7 @@ type BondPriceChangedEvent @entity {
   bond: Account!
   internalPrice: BigInt!
   debtRatio: BigInt!
+  timestamp: Int
 }
 
 type ControlVariableAdjustmentEvent @entity {
@@ -375,6 +397,7 @@ type ControlVariableAdjustmentEvent @entity {
   newBCV: BigInt!
   adjustment: BigInt!
   addition: Boolean!
+  timestamp: Int
 }
 
 type SetBondTermsEvent @entity {
@@ -382,6 +405,7 @@ type SetBondTermsEvent @entity {
   bond: Account!
   param: BondParameter!
   input: BigInt!
+  timestamp: Int
 }
 
 type SetAdjustmentEvent @entity {
@@ -391,12 +415,14 @@ type SetAdjustmentEvent @entity {
   rate: BigInt!
   target: BigInt!
   buffer: BigInt!
+  timestamp: Int
 }
 
 type TreasuryChangedEvent @entity {
   id: ID!
   bond: Account!
   treasury: Account!
+  timestamp: Int
 }
 
 # =================== LinearVesting ======================
@@ -413,17 +439,20 @@ type VestedEvent @entity {
   id: ID!
   from: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 type VestingCreatedEvent @entity {
   id: ID!
   user: Account!
   amount: BigInt!
+  timestamp: Int
 }
 
 type VestingInitializedEvent @entity {
   id: ID!
   duration: BigInt!
+  timestamp: Int
 }
 
 # =================== GovernorAlpha ======================
@@ -464,18 +493,21 @@ type CouncilChangedEvent @entity {
   id: ID!
   oldCouncil: Account!
   newCouncil: Account!
+  timestamp: Int
 }
 
 type FeeReceiverChangedEvent @entity {
   id: ID!
   oldFeeReceiver: Account!
   newFeeReceiver: Account!
+  timestamp: Int
 }
 
 type FeeAmountChangedEvent @entity {
   id: ID!
   oldFeeAmount: BigInt!
   newFeeAmount: BigInt!
+  timestamp: Int
 }
 
 type ProposalCreatedEvent @entity {
@@ -489,28 +521,33 @@ type ProposalCreatedEvent @entity {
   startBlock: BigInt!
   endBlock: BigInt!
   description: String!
+  timestamp: Int
 }
 
 type ProposalCanceledEvent @entity {
   id: ID!
   proposalId: BigInt!
+  timestamp: Int
 }
 
 type ProposalQueuedEvent @entity {
   id: ID!
   proposalId: BigInt!
   eta: BigInt!
+  timestamp: Int
 }
 
 type ProposalExecutedEvent @entity {
   id: ID!
   proposalId: BigInt!
+  timestamp: Int
 }
 
 type ProposalVetoedEvent @entity {
   id: ID!
   proposalId: BigInt!
   support: Boolean!
+  timestamp: Int
 }
 
 type VoteCastEvent @entity {
@@ -519,6 +556,7 @@ type VoteCastEvent @entity {
   proposalId: BigInt!
   support: Boolean!
   votes: BigInt!
+  timestamp: Int
 }
                         
 # ===================== Timelock =========================
@@ -533,16 +571,19 @@ type QueuedTransaction @entity {
 type NewAdminEvent @entity {
   id: ID!
   newAdmin: Account!
+  timestamp: Int
 }
 
 type NewPendingAdminEvent @entity {
   id: ID!
   newPendingAdmin: Account!
+  timestamp: Int
 }
 
 type NewDelayEvent @entity {
   id: ID!
   newDelay: BigInt!
+  timestamp: Int
 }
 
 type CancelTransactionEvent @entity {
@@ -553,6 +594,7 @@ type CancelTransactionEvent @entity {
   signature: String!
   data: Bytes!
   eta: BigInt!
+  timestamp: Int
 }
 
 type ExecuteTransactionEvent @entity {
@@ -563,6 +605,7 @@ type ExecuteTransactionEvent @entity {
   signature: String!
   data: Bytes!
   eta: BigInt!
+  timestamp: Int
 }
 
 type QueueTransactionEvent @entity {
@@ -573,4 +616,5 @@ type QueueTransactionEvent @entity {
   signature: String!
   data: Bytes!
   eta: BigInt!
+  timestamp: Int
 }
