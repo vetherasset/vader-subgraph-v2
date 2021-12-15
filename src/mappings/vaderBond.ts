@@ -219,6 +219,23 @@ export function handleControlVariableAdjustmentEvent(
   adjust.lastBlock = _event.block.number;
   adjust.save();
 
+  let vaderBondContract = VaderBond.bind(
+    Address.fromString(account.id)
+  );
+  let bondPrice = vaderBondContract.bondPrice();
+
+  let price = getOrCreateGlobal(
+    account.id + "_bondPrice",
+    _event.block.timestamp
+  );
+  createOrUpdateGlobal(
+    account.id + "_bondPrice",
+    bondPrice.toString(),
+    _event.block.timestamp,
+    bondPrice.minus(BigInt.fromString(price.value)),
+    true
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new ControlVariableAdjustmentEvent(eventId);
   event.bond = account.id;
