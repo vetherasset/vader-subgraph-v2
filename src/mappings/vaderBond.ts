@@ -31,7 +31,7 @@ import {
   getOrCreateAdjust,
   getOrCreateBondInfo,
   getOrCreateGlobal,
-  getOrCreateTerms,
+  getOrCreateTerm,
   ZERO
 } from "./common";
 import { Treasury } from "../../generated/Treasury/Treasury";
@@ -60,24 +60,24 @@ export function handleInitializeBond(
     vaderBondContract.principalToken().toHexString()
   );
   createOrUpdateGlobal(
-    account.id + "totalDebt",
+    account.id + "_totalDebt",
     _call.inputs._initialDebt.toString(),
     _call.block.timestamp,
     _call.inputs._initialDebt,
     true
   );
   createOrUpdateGlobal(
-    account.id + "lastDecay",
+    account.id + "_lastDecay",
     _call.block.number.toString()
   );
 
-  let terms = getOrCreateTerms(account.id);
-  terms.controlVariable = _call.inputs._controlVariable;
-  terms.vestingTerm = _call.inputs._vestingTerm;
-  terms.minPrice = _call.inputs._minPrice;
-  terms.maxPayout = _call.inputs._maxPayout;
-  terms.maxDebt = _call.inputs._maxDebt;
-  terms.save();
+  let term = getOrCreateTerm(account.id);
+  term.controlVariable = _call.inputs._controlVariable;
+  term.vestingTerm = _call.inputs._vestingTerm;
+  term.minPrice = _call.inputs._minPrice;
+  term.maxPayout = _call.inputs._maxPayout;
+  term.maxDebt = _call.inputs._maxDebt;
+  term.save();
 }
 
 export function handleDeposit(
@@ -110,17 +110,17 @@ export function handleDeposit(
     _call.block.timestamp
   );
 
-  let terms = getOrCreateTerms(account.id);
+  let term = getOrCreateTerm(account.id);
   let bondInfo = getOrCreateBondInfo(account.id, depositor.id);
   bondInfo.payout = bondInfo.payout.plus(_call.outputs.value0);
-  bondInfo.vesting = terms.vestingTerm;
+  bondInfo.vesting = term.vestingTerm;
   bondInfo.lastBlock = _call.block.number;
   bondInfo.save();
 
   let price = vaderBondContract.bondPrice();
-  if (price.gt(terms.minPrice) && terms.minPrice.gt(ZERO)) {
-    terms.minPrice = ZERO;
-    terms.save();
+  if (price.gt(term.minPrice) && term.minPrice.gt(ZERO)) {
+    term.minPrice = ZERO;
+    term.save();
   }
 }
 
@@ -210,9 +210,9 @@ export function handleControlVariableAdjustmentEvent(
     _event.block.timestamp
   );
 
-  let terms = getOrCreateTerms(account.id);
-  terms.controlVariable = _event.params.newBCV;
-  terms.save();
+  let term = getOrCreateTerm(account.id);
+  term.controlVariable = _event.params.newBCV;
+  term.save();
 
   let adjust = getOrCreateAdjust(account.id);
   adjust.rate = _event.params.adjustment;
@@ -239,16 +239,16 @@ export function handleSetBondTermsEvent(
   );
   let bondType = getBondTypeFromIndex(_event.params.param);
   let input = _event.params.input;
-  let terms = getOrCreateTerms(account.id);
+  let term = getOrCreateTerm(account.id);
 
   if (bondType == "VESTING") {
-    terms.vestingTerm = input;
+    term.vestingTerm = input;
   } else if (bondType == "PAYOUT") {
-    terms.maxPayout = input;
+    term.maxPayout = input;
   } else if (bondType == "DEBT") {
-    terms.maxDebt = input;
+    term.maxDebt = input;
   }
-  terms.save();
+  term.save();
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetBondTermsEvent(eventId);

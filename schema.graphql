@@ -60,7 +60,7 @@ type Account @entity {
   vest: [Vest]! @derivedFrom(field: "account")
   bondInfo: [BondInfo]! @derivedFrom(field: "bond")
   bondDepositorInfo: [BondInfo]! @derivedFrom(field: "depositor")
-  bondTerms: [Terms]! @derivedFrom(field: "bond")
+  bondTerm: [Term]! @derivedFrom(field: "bond")
   bondAdjust: [Adjust]! @derivedFrom(field: "bond")
   burnSenderEvent: [BurnEvent]! @derivedFrom(field: "sender")
   burnToEvent: [BurnEvent]! @derivedFrom(field: "to")
@@ -335,7 +335,7 @@ type WithdrawEvent @entity {
 }
 
 # ===================== VaderBond ========================
-type Terms @entity {
+type Term @entity {
   id: ID!
   bond: Account!
   controlVariable: BigInt!

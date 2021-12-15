@@ -20,7 +20,7 @@ import {
   TransferEvent,
   Vest,
   VetoStatus,
-  Terms,
+  Term,
   BondInfo,
   Adjust,
 } from "../../generated/schema";
@@ -595,23 +595,23 @@ export function getBondTypeFromIndex(
   return "";
 }
 
-export function getOrCreateTerms(
+export function getOrCreateTerm(
   _address: string
-): Terms {
-  let terms = Terms.load(_address);
+): Term {
+  let term = Term.load(_address);
 
-  if (!terms) {
-    terms = new Terms(_address);
-    terms.bond = _address;
-    terms.controlVariable = ZERO;
-    terms.vestingTerm = ZERO;
-    terms.minPrice = ZERO;
-    terms.maxPayout = ZERO;
-    terms.maxDebt = ZERO;
-    terms.save();
+  if (!term) {
+    term = new Term(_address);
+    term.bond = _address;
+    term.controlVariable = ZERO;
+    term.vestingTerm = ZERO;
+    term.minPrice = ZERO;
+    term.maxPayout = ZERO;
+    term.maxDebt = ZERO;
+    term.save();
   }
 
-  return terms as Terms;
+  return term as Term;
 }
 
 export function getOrCreateBondInfo(
