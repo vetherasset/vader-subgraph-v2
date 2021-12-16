@@ -21,8 +21,7 @@ import {
   ControlVariableAdjustmentEvent,
   SetBondTermsEvent,
   SetAdjustmentEvent,
-  TreasuryChangedEvent,
-  Token
+  TreasuryChangedEvent
 } from "../../generated/schema";
 import {
   createOrUpdateGlobal,
@@ -35,6 +34,42 @@ import {
   ZERO
 } from "./common";
 import { Treasury } from "../../generated/Treasury/Treasury";
+
+function updateBondGlobalVariables(
+  _address: string,
+  _timestamp: BigInt
+): void {
+  let vaderBondContract = VaderBond.bind(
+    Address.fromString(_address)
+  );
+
+  let bondPrice = vaderBondContract.bondPrice();
+  let totalDebt = vaderBondContract.totalDebt();
+
+  let price = getOrCreateGlobal(
+    _address + "_bondPrice",
+    _timestamp
+  );
+  let debt = getOrCreateGlobal(
+    _address + "_totalDebt",
+    _timestamp
+  );
+
+  createOrUpdateGlobal(
+    _address + "_bondPrice",
+    bondPrice.toString(),
+    _timestamp,
+    bondPrice.minus(BigInt.fromString(price.value)),
+    true
+  );
+  createOrUpdateGlobal(
+    _address + "_totalDebt",
+    totalDebt.toString(),
+    _timestamp,
+    totalDebt.minus(BigInt.fromString(debt.value)),
+    true
+  );
+}
 
 export function handleInitializeBond(
   _call: InitializeBondCall
@@ -69,6 +104,11 @@ export function handleInitializeBond(
   createOrUpdateGlobal(
     account.id + "_lastDecay",
     _call.block.number.toString()
+  );
+
+  updateBondGlobalVariables(
+    _call.to.toHexString(),
+    _call.block.timestamp
   );
 
   let term = getOrCreateTerm(account.id);
@@ -122,6 +162,11 @@ export function handleDeposit(
     term.minPrice = ZERO;
     term.save();
   }
+
+  updateBondGlobalVariables(
+    _call.to.toHexString(),
+    _call.block.timestamp
+  );
 }
 
 export function handleBondCreatedEvent(
@@ -163,6 +208,11 @@ export function handleBondRedeemedEvent(
   bondInfo.lastBlock = _event.block.number;
   bondInfo.save();
 
+  updateBondGlobalVariables(
+    _event.address.toHexString(),
+    _event.block.timestamp
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new BondRedeemedEvent(eventId);
   event.bond = account.id;
@@ -181,16 +231,9 @@ export function handleBondPriceChangedEvent(
     _event.block.timestamp
   );
 
-  let price = getOrCreateGlobal(
-    account.id + "_bondPrice",
+  updateBondGlobalVariables(
+    _event.address.toHexString(),
     _event.block.timestamp
-  );
-  createOrUpdateGlobal(
-    account.id + "_bondPrice",
-    _event.params.internalPrice.toString(),
-    _event.block.timestamp,
-    _event.params.internalPrice.minus(BigInt.fromString(price.value)),
-    true
   );
 
   let eventId = _event.transaction.hash.toHexString();
@@ -219,21 +262,9 @@ export function handleControlVariableAdjustmentEvent(
   adjust.lastBlock = _event.block.number;
   adjust.save();
 
-  let vaderBondContract = VaderBond.bind(
-    Address.fromString(account.id)
-  );
-  let bondPrice = vaderBondContract.bondPrice();
-
-  let price = getOrCreateGlobal(
-    account.id + "_bondPrice",
+  updateBondGlobalVariables(
+    _event.address.toHexString(),
     _event.block.timestamp
-  );
-  createOrUpdateGlobal(
-    account.id + "_bondPrice",
-    bondPrice.toString(),
-    _event.block.timestamp,
-    bondPrice.minus(BigInt.fromString(price.value)),
-    true
   );
 
   let eventId = _event.transaction.hash.toHexString();
@@ -267,6 +298,11 @@ export function handleSetBondTermsEvent(
   }
   term.save();
 
+  updateBondGlobalVariables(
+    _event.address.toHexString(),
+    _event.block.timestamp
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetBondTermsEvent(eventId);
   event.bond = account.id;
@@ -291,6 +327,11 @@ export function handleSetAdjustmentEvent(
   adjust.buffer = _event.params.buffer;
   adjust.lastBlock = _event.block.number;
   adjust.save();
+
+  updateBondGlobalVariables(
+    _event.address.toHexString(),
+    _event.block.timestamp
+  );
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetAdjustmentEvent(eventId);
@@ -318,6 +359,11 @@ export function handleTreasuryChangedEvent(
   createOrUpdateGlobal(
     _event.address.toHexString() + "_treasury",
     treasury.id
+  );
+
+  updateBondGlobalVariables(
+    _event.address.toHexString(),
+    _event.block.timestamp
   );
 
   let eventId = _event.transaction.hash.toHexString();

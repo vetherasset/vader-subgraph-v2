@@ -53,7 +53,7 @@ export let CONVERTER = '0x0000000000000000000000000000000000000000';
 export let LINEAR_VESTING = '0x0000000000000000000000000000000000000000';
 export let XVADER_ADDRESS = '0x0aa1056ee563c14484fcc530625ca74575c97512';
 export let SEED_LIQUIDITY = '0x0000000000000000000000000000000000000000';
-export let VADER_BOND_ADDRESS = '0x66bcc1c537509ba441ccc9df39e18cc142c59775';
+export let VADER_BOND_ADDRESS0 = '0x66bcc1c537509ba441ccc9df39e18cc142c59775';
 export let TREASURY_ADDRESS = '0x15d89713ea5c46de381c51a34fe4c743677576b4';
 
 export function initConstants(): void {
@@ -621,7 +621,7 @@ export function getOrCreateBondInfo(
   let bondInfo = BondInfo.load(_address + "_" + _depositor);
 
   if (!bondInfo) {
-    bondInfo = new BondInfo(_address);
+    bondInfo = new BondInfo(_address + "_" + _depositor);
     bondInfo.bond = _address;
     bondInfo.depositor = _depositor;
     bondInfo.payout = ZERO;
