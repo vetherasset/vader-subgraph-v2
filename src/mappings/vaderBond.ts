@@ -78,9 +78,7 @@ export function handleInitializeBond(
     _call.to.toHexString(),
     _call.block.timestamp
   );
-  let vaderBondContract = VaderBond.bind(
-    Address.fromString(account.id)
-  );
+  let vaderBondContract = VaderBond.bind(_call.to);
 
   createOrUpdateGlobal(
     account.id + "_treasury",
@@ -124,9 +122,7 @@ export function handleDeposit(
   _call: DepositCall
 ): void {
   let account = getOrCreateAccount(_call.to.toHexString());
-  let vaderBondContract = VaderBond.bind(
-    Address.fromString(account.id)
-  );
+  let vaderBondContract = VaderBond.bind(_call.to);
   let treasuryContract = Treasury.bind(
     vaderBondContract.treasury()
   );
@@ -175,6 +171,17 @@ export function handleBondCreatedEvent(
   let account = getOrCreateAccount(
     _event.address.toHexString(),
     _event.block.timestamp
+  );
+
+  let vaderBondContract = VaderBond.bind(_event.address);
+  let treasury = vaderBondContract.treasury().toHexString();
+  let principalToken = vaderBondContract.principalToken().toHexString();
+
+  createOrUpdateGlobal(
+    "TVB_" + treasury + "_" + principalToken,
+    '',
+    _event.block.timestamp,
+    _event.params.deposit
   );
 
   let eventId = _event.transaction.hash.toHexString();

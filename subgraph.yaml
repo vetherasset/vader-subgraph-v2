@@ -256,7 +256,7 @@ dataSources:
           handler: handleEnter
         - function: leave(uint256)
           handler: handleLeave
-      file: ./src/mappings/xvader.ts
+      file: ./src/mappings/XVader.ts
 
   # ======================== Treasury ========================
   - kind: ethereum/contract
@@ -280,16 +280,93 @@ dataSources:
           handler: handleSetBondContractEvent
         - event: Withdraw(indexed address,indexed address,uint256)
           handler: handleWithdrawEvent
+        - event: SetMaxPayout(indexed address,uint256)
+          handler: handleSetMaxPayoutEvent
+        - event: ResetPayout(indexed address,uint256)
+          handler: handleResetPayoutEvent
+      callHandlers:
+        - function: deposit(address,uint256,uint256)
+          handler: handleDeposit
+      file: ./src/mappings/treasury.ts
+
+  - kind: ethereum/contract
+    name: Treasury2
+    network: kovan
+    source:
+      address: "0x666266f24E17d9ab7bCb25715C75146143E16c39"
+      abi: Treasury
+      startBlock: 28776877
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - token
+      abis:
+        - name: Treasury
+          file: ./abis/Treasury.json
+      eventHandlers:
+        - event: SetBondContract(address,bool)
+          handler: handleSetBondContractEvent
+        - event: Withdraw(indexed address,indexed address,uint256)
+          handler: handleWithdrawEvent
+        - event: SetMaxPayout(indexed address,uint256)
+          handler: handleSetMaxPayoutEvent
+        - event: ResetPayout(indexed address,uint256)
+          handler: handleResetPayoutEvent
+      callHandlers:
+        - function: deposit(address,uint256,uint256)
+          handler: handleDeposit
       file: ./src/mappings/treasury.ts
 
   # ======================= VaderBond ========================
   - kind: ethereum/contract
-    name: VaderBond
+    name: VaderBond1
     network: kovan
     source:
       address: "0x66BcC1c537509bA441ccc9DF39E18CC142C59775"
       abi: VaderBond
       startBlock: 28674821
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - token
+      abis:
+        - name: VaderBond
+          file: ./abis/VaderBond.json
+        - name: Treasury
+          file: ./abis/Treasury.json
+      eventHandlers:
+        - event: BondCreated(uint256,uint256,uint256)
+          handler: handleBondCreatedEvent
+        - event: BondRedeemed(indexed address,uint256,uint256)
+          handler: handleBondRedeemedEvent
+        - event: BondPriceChanged(uint256,uint256)
+          handler: handleBondPriceChangedEvent
+        - event: ControlVariableAdjustment(uint256,uint256,uint256,bool)
+          handler: handleControlVariableAdjustmentEvent
+        - event: SetBondTerms(indexed uint8,uint256)
+          handler: handleSetBondTermsEvent
+        - event: SetAdjustment(bool,uint256,uint256,uint256)
+          handler: handleSetAdjustmentEvent
+        - event: TreasuryChanged(address)
+          handler: handleTreasuryChangedEvent
+      callHandlers:
+        - function: initializeBond(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleInitializeBond
+        - function: deposit(uint256,uint256,address)
+          handler: handleDeposit
+      file: ./src/mappings/vaderBond.ts
+
+  - kind: ethereum/contract
+    name: VaderBond2
+    network: kovan
+    source:
+      address: "0xd932cc11F49df7638999E2a313e5808667363750"
+      abi: VaderBond
+      startBlock: 28759864
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

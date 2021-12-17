@@ -73,6 +73,8 @@ type Account @entity {
   bondPriceChangedEvent: [BondPriceChangedEvent]! @derivedFrom(field: "bond")
   bondControlVariableAdjustmentEvent: [ControlVariableAdjustmentEvent]! @derivedFrom(field: "bond")
   bondSetBondContractEvent: [SetBondContractEvent]! @derivedFrom(field: "bond")
+  bondSetMaxPayoutEvent: [SetMaxPayoutEvent]! @derivedFrom(field: "bond")
+  bondResetPayoutEvent: [ResetPayoutEvent]! @derivedFrom(field: "bond")
   bondSetBondTermsEvent: [SetBondTermsEvent]! @derivedFrom(field: "bond")
   bondSetAdjustmentEvent: [SetAdjustmentEvent]! @derivedFrom(field: "bond")
   bondTreasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "bond")
@@ -92,6 +94,8 @@ type Account @entity {
   positionClosedEvent: [PositionClosedEvent]! @derivedFrom(field: "sender")
   proposalCreatedEvent: [ProposalCreatedEvent]! @derivedFrom(field: "proposer")
   treasurySetBondContractEvent: [SetBondContractEvent]! @derivedFrom(field: "treasury")
+  treasurySetMaxPayoutEvent: [SetMaxPayoutEvent]! @derivedFrom(field: "treasury")
+  treasuryResetPayoutEvent: [ResetPayoutEvent]! @derivedFrom(field: "treasury")
   treasuryChangedEvent: [TreasuryChangedEvent]! @derivedFrom(field: "treasury")
   treasuryWithdrawEvent: [WithdrawEvent]! @derivedFrom(field: "treasury")
   treasuryWithdrawDestinationEvent: [WithdrawEvent]! @derivedFrom(field: "destination")
@@ -331,6 +335,22 @@ type WithdrawEvent @entity {
   token: Token!
   destination: Account!
   amount: BigInt!
+  timestamp: Int
+}
+
+type SetMaxPayoutEvent @entity {
+  id: ID!
+  treasury: Account!
+  bond: Account!
+  max: BigInt!
+  timestamp: Int
+}
+
+type ResetPayoutEvent @entity {
+  id: ID!
+  treasury: Account!
+  bond: Account!
+  sold: BigInt!
   timestamp: Int
 }
 
