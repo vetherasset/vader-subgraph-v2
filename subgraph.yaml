@@ -52,9 +52,9 @@ dataSources:
     name: USDV
     network: kovan
     source:
-      address: "0xfd87ba583bd2071713fb5CB12086536a26eec18e"
+      address: "0x0de905dfb036521f5A45Da90B2D9e8a74a9CE42E"
       abi: USDV
-      startBlock: 28115780
+      startBlock: 29237977
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -74,6 +74,10 @@ dataSources:
           handler: handleApprovalEvent
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferEvent
+        - event: LockCreated(address,uint8,uint256,uint256)
+          handler: handleLockCreatedEvent
+        - event: LockClaimed(address,uint8,uint256,uint256)
+          handler: handleLockClaimedEvent
       file: ./src/mappings/usdv.ts
 
   # ======================= BOND LP ========================

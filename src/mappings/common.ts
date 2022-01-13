@@ -22,6 +22,7 @@ import {
   Term,
   BondInfo,
   Adjust,
+  Lock,
 } from "../../generated/schema";
 
 export let ZERO = BigInt.fromI32(0);
@@ -340,6 +341,26 @@ export function getOrCreateVest(
   }
 
   return vest as Vest;
+}
+
+export function getOrCreateLock(
+  _address: string,
+  _id: number
+): Lock {
+  let lockId = _address + '_' + _id.toString();
+  let lock = Lock.load(lockId);
+
+  if (!lock) {
+    lock = new Lock(lockId);
+    lock.user = _address;
+    lock.token = 'USDV';
+    lock.amount = ZERO;
+    lock.release = ZERO;
+    lock.isRemoved = true;
+    lock.save();
+  }
+
+  return lock as Lock;
 }
 
 export function createOrUpdateAllowance(

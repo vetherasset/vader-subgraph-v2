@@ -6,6 +6,11 @@ enum DateType {
   Hour
 }
 
+enum LockTypes {
+  USDV
+  VADER
+}
+
 enum ProposalState {
   Pending
   Active
@@ -58,6 +63,7 @@ type Account @entity {
   allowance: [Allowance]! @derivedFrom(field: "owner")
   nftAllowance: [NFTAllowance]! @derivedFrom(field: "owner")
   vest: [Vest]! @derivedFrom(field: "account")
+  lock: [Lock]! @derivedFrom(field: "user")
   bondInfo: [BondInfo]! @derivedFrom(field: "bond")
   bondDepositorInfo: [BondInfo]! @derivedFrom(field: "depositor")
   bondTerm: [Term]! @derivedFrom(field: "bond")
@@ -87,6 +93,8 @@ type Account @entity {
   grantClaimedEvent: [GrantClaimedEvent]! @derivedFrom(field: "beneficiary")
   grantDistributedEvent: [GrantDistributedEvent]! @derivedFrom(field: "recipient")
   lossCoveredEvent: [LossCoveredEvent]! @derivedFrom(field: "recipient")
+  lockCreatedEvent: [LockCreatedEvent]! @derivedFrom(field: "user")
+  lockClaimedEvent: [LockClaimedEvent]! @derivedFrom(field: "user")
   newAdminEvent: [NewAdminEvent]! @derivedFrom(field: "newAdmin")
   newPendingAdminEvent: [NewPendingAdminEvent]! @derivedFrom(field: "newPendingAdmin")
   positionOpenedFromEvent: [PositionOpenedEvent]! @derivedFrom(field: "from")
@@ -186,6 +194,32 @@ type ProtocolInitializedEvent @entity {
 }
 
 # ======================== USDV =========================
+type LockCreatedEvent @entity {
+  id: ID!
+  user: Account!
+  lockType: LockTypes!
+  lockAmount: BigInt!
+  lockRelease: BigInt!
+  timestamp: Int
+}
+
+type LockClaimedEvent @entity {
+  id: ID!
+  user: Account!
+  lockType: LockTypes!
+  lockAmount: BigInt!
+  lockRelease: BigInt!
+  timestamp: Int
+}
+
+type Lock @entity {
+  id: ID!
+  user: Account!
+  token: LockTypes!
+  amount: BigInt!
+  release: BigInt!
+  isRemoved: Boolean!
+}
 
 # ====================== Converter ======================
 type ConversionEvent @entity {
