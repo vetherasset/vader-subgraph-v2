@@ -78,6 +78,11 @@ dataSources:
           handler: handleLockCreatedEvent
         - event: LockClaimed(address,uint8,uint256,uint256)
           handler: handleLockClaimedEvent
+      callHandlers:
+        - function: claim(uint256)
+          handler: handleClaim
+        - function: claimAll()
+          handler: handleClaimAll
       file: ./src/mappings/usdv.ts
 
   # ======================= BOND LP ========================

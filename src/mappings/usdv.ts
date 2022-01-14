@@ -3,7 +3,9 @@ import {
   Approval,
   LockCreated,
   LockClaimed,
-  Transfer
+  Transfer,
+  ClaimCall,
+  ClaimAllCall
 } from "../../generated/USDV/USDV";
 import {
   LockCreatedEvent,
@@ -16,8 +18,71 @@ import {
   getOrCreateAccount,
   getOrCreateGlobal,
   getOrCreateLock,
+  MONE,
   ONE,
 } from "./common";
+
+export function handleClaim(
+  _call: ClaimCall
+): void {
+  let account = getOrCreateAccount(
+    _call.from.toHexString(),
+    _call.block.timestamp
+  );
+
+  let lockCount = getOrCreateGlobal(
+    'LOCK_COUNT_' + account.id,
+    _call.block.timestamp
+  );
+
+  let lock = getOrCreateLock(account.id, _call.inputs.i.toI32());
+  let lastLock = getOrCreateLock(
+    account.id,
+    Number.parseInt(lockCount.value)
+  );
+
+  lock.token = lastLock.token;
+  lock.amount = lastLock.amount;
+  lock.release = lastLock.release;
+  lock.save();
+
+  lastLock.isRemoved = true;
+  lastLock.save();
+
+  createOrUpdateGlobal(
+    'LOCK_COUNT_' + account.id,
+    '',
+    _call.block.timestamp,
+    MONE
+  );
+}
+
+export function handleClaimAll(
+  _call: ClaimAllCall
+): void {
+  let account = getOrCreateAccount(
+    _call.from.toHexString(),
+    _call.block.timestamp
+  );
+
+  let lockCount = getOrCreateGlobal(
+    'LOCK_COUNT_' + account.id,
+    _call.block.timestamp
+  );
+
+  for (let i = 0; i < Number.parseInt(lockCount.value); i++) {
+    let lock = getOrCreateLock(account.id, i);
+    lock.isRemoved = true;
+    lock.save();
+  }
+
+  createOrUpdateGlobal(
+    'LOCK_COUNT_' + account.id,
+    '',
+    _call.block.timestamp,
+    BigInt.fromString(lockCount.value).neg()
+  );
+}
 
 export function handleApprovalEvent(
   _event: Approval
@@ -57,7 +122,10 @@ export function handleLockCreatedEvent(
     'LOCK_COUNT_' + account.id,
     _event.block.timestamp
   );
-  let lock = getOrCreateLock(account.id, Number(lockCount.value));
+  let lock = getOrCreateLock(
+    account.id,
+    Number.parseInt(lockCount.value)
+  );
   lock.token = _event.params.lockType == 0 ? 'USDV' : 'VADER';
   lock.amount = _event.params.lockAmount;
   lock.release = _event.params.lockRelease;
