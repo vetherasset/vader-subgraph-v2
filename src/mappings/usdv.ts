@@ -5,7 +5,11 @@ import {
   LockClaimed,
   Transfer,
   ClaimCall,
-  ClaimAllCall
+  ClaimAllCall,
+  SetGuardianCall,
+  SetMinterCall,
+  SetLockCall,
+  SetValidatorCall
 } from "../../generated/USDV/USDV";
 import {
   LockCreatedEvent,
@@ -82,6 +86,30 @@ export function handleClaimAll(
     _call.block.timestamp,
     BigInt.fromString(lockCount.value).neg()
   );
+}
+
+export function handleSetGuardian(
+  _call: SetGuardianCall
+): void {
+  createOrUpdateGlobal('USDV_GUARDIAN', _call.inputs._guardian.toHexString());
+}
+
+export function handleSetMinter(
+  _call: SetMinterCall
+): void {
+  createOrUpdateGlobal('USDV_MINTER', _call.inputs._minter.toHexString());
+}
+
+export function handleSetLock(
+  _call: SetLockCall
+): void {
+  createOrUpdateGlobal('USDV_LOCKED', _call.inputs._lock ? 'true' : 'false');
+}
+
+export function handleSetValidator(
+  _call: SetValidatorCall
+): void {
+  createOrUpdateGlobal('USDV_VALIDATOR', _call.inputs._validator.toHexString());
 }
 
 export function handleApprovalEvent(

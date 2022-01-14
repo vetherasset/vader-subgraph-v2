@@ -322,12 +322,12 @@
     },
     {
         "inputs": [],
-        "name": "lbt",
+        "name": "isLocked",
         "outputs": [
             {
-                "internalType": "contract ILiquidityBasedTWAP",
+                "internalType": "bool",
                 "name": "",
-                "type": "address"
+                "type": "bool"
             }
         ],
         "stateMutability": "view",
@@ -519,6 +519,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "validator",
+        "outputs": [
+            {
+                "internalType": "contract IUnlockValidator",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -538,6 +551,11 @@
             {
                 "internalType": "uint256",
                 "name": "exchangeFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "window",
                 "type": "uint256"
             }
         ],
@@ -566,6 +584,11 @@
             {
                 "internalType": "uint256",
                 "name": "exchangeFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "window",
                 "type": "uint256"
             }
         ],
@@ -614,12 +637,12 @@
     {
         "inputs": [
             {
-                "internalType": "contract ILiquidityBasedTWAP",
-                "name": "_lbt",
+                "internalType": "contract IUnlockValidator",
+                "name": "_validator",
                 "type": "address"
             }
         ],
-        "name": "setLBTwap",
+        "name": "setValidator",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

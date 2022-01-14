@@ -83,6 +83,14 @@ dataSources:
           handler: handleClaim
         - function: claimAll()
           handler: handleClaimAll
+        - function: setGuardian(address)
+          handler: handleSetGuardian
+        - function: setMinter(address)
+          handler: handleSetMinter
+        - function: setLock(bool)
+          handler: handleSetLock
+        - function: setValidator(address)
+          handler: handleSetValidator
       file: ./src/mappings/usdv.ts
 
   # ======================= BOND LP ========================
