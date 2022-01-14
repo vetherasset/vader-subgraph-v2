@@ -116,6 +116,7 @@ type Account @entity {
   vestedEvent: [VestedEvent]! @derivedFrom(field: "from")
   validateEvent: [ValidateEvent]! @derivedFrom(field: "account")
   inValidateEvent: [InValidateEvent]! @derivedFrom(field: "account")
+  setOracleEvent: [SetOracleEvent]! @derivedFrom(field: "oracle")
 }
 
 # ======================== Token ========================
@@ -521,6 +522,13 @@ type InValidateEvent @entity {
 type ValidateEvent @entity {
   id: ID!
   account: Account!
+  timestamp: Int
+}
+
+# ==================== UniswapTwap =======================
+type SetOracleEvent @entity {
+  id: ID!
+  oracle: Account!
   timestamp: Int
 }
 

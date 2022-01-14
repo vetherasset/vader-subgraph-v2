@@ -30,6 +30,7 @@ export function handleInValidateEvent(
   event.timestamp = _event.block.timestamp.toI32();
   event.save();
 }
+
 export function handleValidateEvent(
   _event: Validate
 ): void {
