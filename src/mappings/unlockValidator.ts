@@ -20,8 +20,8 @@ export function handleInValidateEvent(
   );
 
   createOrUpdateGlobal(
-    'INVALIDATED_' + account.id,
-    'true'
+    "InValidated_" + account.id,
+    "true"
   );
 
   let eventId = _event.transaction.hash.toHexString();
@@ -40,8 +40,8 @@ export function handleValidateEvent(
   );
 
   createOrUpdateGlobal(
-    'INVALIDATED_' + account.id,
-    'false'
+    "InValidated_" + account.id,
+    "false"
   );
 
   let eventId = _event.transaction.hash.toHexString();

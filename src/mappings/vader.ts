@@ -32,8 +32,11 @@ import {
   SEED_LIQUIDITY,
   XVADER_ADDRESS,
   getOrCreateBalance,
+  UNISWAP_TWAP,
+  UNISWAP_TWAP_BLOCKNUMBER,
 } from "./common";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { UniswapTwap } from "../../generated/UniswapTwap/UniswapTwap";
 
 export function handleApprovalEvent(
   _event: Approval
@@ -68,26 +71,87 @@ export function handleTransferEvent(
     _event.block.timestamp
   );
 
+  // Circulating Supply
   let token = getOrCreateToken(VADER_ADDRESS);
   let balanceInVader = getOrCreateBalance(VADER_ADDRESS, VADER_ADDRESS);
   let balanceInConverter = getOrCreateBalance(CONVERTER, VADER_ADDRESS);
   let balanceInVesting = getOrCreateBalance(LINEAR_VESTING, VADER_ADDRESS);
   let balanceInSeed = getOrCreateBalance(SEED_LIQUIDITY, VADER_ADDRESS);
+  let circulatingSupply = getOrCreateGlobal(
+    "circulatingSupply",
+    _event.block.timestamp
+  );
   createOrUpdateGlobal(
     "circulatingSupply",
+    '',
+    _event.block.timestamp,
     token.totalSupply
       .minus(balanceInVader.balance)
       .minus(balanceInConverter.balance)
       .minus(balanceInVesting.balance)
-      .minus(balanceInSeed.balance).toString()
+      .minus(balanceInSeed.balance)
+      .minus(BigInt.fromString(circulatingSupply.value))
   );
 
+  // XVader Price
   let xvaderAddress = Address.fromString(XVADER_ADDRESS);
   if (
     _event.params.from.equals(xvaderAddress) ||
     _event.params.to.equals(xvaderAddress)
   ) {
     createOrUpdateXVaderPrice(_event.block.timestamp);
+  }
+
+  // Uniswap Twap
+  if (_event.block.number.gt(UNISWAP_TWAP_BLOCKNUMBER)) {
+    let uniswapTwap = UniswapTwap.bind(Address.fromString(UNISWAP_TWAP));
+    let staleVaderPrice = getOrCreateGlobal(
+      "staleVaderPrice",
+      _event.block.timestamp
+    );
+    createOrUpdateGlobal(
+      "staleVaderPrice",
+      '',
+      _event.block.timestamp,
+      uniswapTwap.getStaleVaderPrice()
+        .minus(BigInt.fromString(staleVaderPrice.value))
+    );
+
+    let chainlinkPrice = getOrCreateGlobal(
+      "chainlinkPrice",
+      _event.block.timestamp
+    );
+    createOrUpdateGlobal(
+      "chainlinkPrice",
+      '',
+      _event.block.timestamp,
+      uniswapTwap.getChainlinkPrice()
+        .minus(BigInt.fromString(chainlinkPrice.value))
+    );
+
+    let vaderEthPriceAverage = getOrCreateGlobal(
+      "vaderEthPriceAverage",
+      _event.block.timestamp
+    );
+    createOrUpdateGlobal(
+      "vaderEthPriceAverage",
+      '',
+      _event.block.timestamp,
+      uniswapTwap.getVaderEthPriceAverage()
+        .minus(BigInt.fromString(vaderEthPriceAverage.value))
+    );
+
+    let vaderEthSpotPrice = getOrCreateGlobal(
+      "vaderEthSpotPrice",
+      _event.block.timestamp
+    );
+    createOrUpdateGlobal(
+      "vaderEthSpotPrice",
+      '',
+      _event.block.timestamp,
+      uniswapTwap.getVaderEthSpotPrice()
+        .minus(BigInt.fromString(vaderEthSpotPrice.value))
+    );
   }
 }
 

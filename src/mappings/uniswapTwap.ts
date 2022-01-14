@@ -17,7 +17,7 @@ export function handleSetOracleEvent(
     _event.block.timestamp
   );
 
-  createOrUpdateGlobal('ORACLE', account.id);
+  createOrUpdateGlobal("Oracle", account.id);
 
   let eventId = _event.transaction.hash.toHexString();
   let event = new SetOracleEvent(eventId);

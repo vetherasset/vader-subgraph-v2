@@ -13,9 +13,9 @@ dataSources:
     name: Vader
     network: kovan
     source:
-      address: "0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE"
+      address: "0xB46dbd07ce34813623FB0643b21DCC8D0268107D"
       abi: Vader
-      startBlock: 28597367
+      startBlock: 28758458
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -30,6 +30,8 @@ dataSources:
       abis:
         - name: Vader
           file: ./abis/Vader.json
+        - name: UniswapTwap
+          file: ./abis/UniswapTwap.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApprovalEvent

@@ -35,7 +35,7 @@ export function handleClaim(
   );
 
   let lockCount = getOrCreateGlobal(
-    'LOCK_COUNT_' + account.id,
+    "LOCK_COUNT_" + account.id,
     _call.block.timestamp
   );
 
@@ -54,8 +54,8 @@ export function handleClaim(
   lastLock.save();
 
   createOrUpdateGlobal(
-    'LOCK_COUNT_' + account.id,
-    '',
+    "LOCK_COUNT_" + account.id,
+    "",
     _call.block.timestamp,
     MONE
   );
@@ -70,7 +70,7 @@ export function handleClaimAll(
   );
 
   let lockCount = getOrCreateGlobal(
-    'LOCK_COUNT_' + account.id,
+    "LOCK_COUNT_" + account.id,
     _call.block.timestamp
   );
 
@@ -81,8 +81,8 @@ export function handleClaimAll(
   }
 
   createOrUpdateGlobal(
-    'LOCK_COUNT_' + account.id,
-    '',
+    "LOCK_COUNT_" + account.id,
+    "",
     _call.block.timestamp,
     BigInt.fromString(lockCount.value).neg()
   );
@@ -91,25 +91,25 @@ export function handleClaimAll(
 export function handleSetGuardian(
   _call: SetGuardianCall
 ): void {
-  createOrUpdateGlobal('USDV_GUARDIAN', _call.inputs._guardian.toHexString());
+  createOrUpdateGlobal("USDV_GUARDIAN", _call.inputs._guardian.toHexString());
 }
 
 export function handleSetMinter(
   _call: SetMinterCall
 ): void {
-  createOrUpdateGlobal('USDV_MINTER', _call.inputs._minter.toHexString());
+  createOrUpdateGlobal("USDV_MINTER", _call.inputs._minter.toHexString());
 }
 
 export function handleSetLock(
   _call: SetLockCall
 ): void {
-  createOrUpdateGlobal('USDV_LOCKED', _call.inputs._lock ? 'true' : 'false');
+  createOrUpdateGlobal("USDV_LOCKED", _call.inputs._lock ? "true" : "false");
 }
 
 export function handleSetValidator(
   _call: SetValidatorCall
 ): void {
-  createOrUpdateGlobal('USDV_VALIDATOR', _call.inputs._validator.toHexString());
+  createOrUpdateGlobal("USDV_VALIDATOR", _call.inputs._validator.toHexString());
 }
 
 export function handleApprovalEvent(
@@ -147,22 +147,22 @@ export function handleLockCreatedEvent(
   );
 
   let lockCount = getOrCreateGlobal(
-    'LOCK_COUNT_' + account.id,
+    "Lock_Count_" + account.id,
     _event.block.timestamp
   );
   let lock = getOrCreateLock(
     account.id,
     Number.parseInt(lockCount.value)
   );
-  lock.token = _event.params.lockType == 0 ? 'USDV' : 'VADER';
+  lock.token = _event.params.lockType == 0 ? "USDV" : "VADER";
   lock.amount = _event.params.lockAmount;
   lock.release = _event.params.lockRelease;
   lock.isRemoved = false;
   lock.save();
 
   createOrUpdateGlobal(
-    'LOCK_COUNT_' + account.id,
-    '',
+    "Lock_Count_" + account.id,
+    "",
     _event.block.timestamp,
     ONE
   );
@@ -170,7 +170,7 @@ export function handleLockCreatedEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new LockCreatedEvent(eventId);
   event.user = account.id;
-  event.lockType = _event.params.lockType == 0 ? 'USDV' : 'VADER';
+  event.lockType = _event.params.lockType == 0 ? "USDV" : "VADER";
   event.lockAmount = _event.params.lockAmount;
   event.lockRelease = _event.params.lockRelease;
   event.timestamp = _event.block.timestamp.toI32();
@@ -188,7 +188,7 @@ export function handleLockClaimedEvent(
   let eventId = _event.transaction.hash.toHexString();
   let event = new LockClaimedEvent(eventId);
   event.user = account.id;
-  event.lockType = _event.params.lockType == 0 ? 'USDV' : 'VADER';
+  event.lockType = _event.params.lockType == 0 ? "USDV" : "VADER";
   event.lockAmount = _event.params.lockAmount;
   event.lockRelease = _event.params.lockRelease;
   event.timestamp = _event.block.timestamp.toI32();
