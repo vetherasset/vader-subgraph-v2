@@ -24,6 +24,7 @@ import {
   Adjust,
   Lock,
 } from "../../generated/schema";
+import { UniswapTwap } from "../../generated/UniswapTwap/UniswapTwap";
 
 export let ZERO = BigInt.fromI32(0);
 export let ONE = BigInt.fromI32(1);
@@ -598,6 +599,59 @@ export function createOrUpdateXVaderPrice(
     _timestamp,
     BigInt.fromString(xvaderPrice.value).minus(BigInt.fromString(price)),
     true
+  );
+}
+
+export function updateVaderPrices(
+  _timestamp: BigInt
+): void {
+  let uniswapTwap = UniswapTwap.bind(Address.fromString(UNISWAP_TWAP));
+  let staleVaderPrice = getOrCreateGlobal(
+    "staleVaderPrice",
+    _timestamp
+  );
+  createOrUpdateGlobal(
+    "staleVaderPrice",
+    '',
+    _timestamp,
+    uniswapTwap.getStaleVaderPrice()
+      .minus(BigInt.fromString(staleVaderPrice.value))
+  );
+
+  let chainlinkPrice = getOrCreateGlobal(
+    "chainlinkPrice",
+    _timestamp
+  );
+  createOrUpdateGlobal(
+    "chainlinkPrice",
+    '',
+    _timestamp,
+    uniswapTwap.getChainlinkPrice()
+      .minus(BigInt.fromString(chainlinkPrice.value))
+  );
+
+  let vaderEthPriceAverage = getOrCreateGlobal(
+    "vaderEthPriceAverage",
+    _timestamp
+  );
+  createOrUpdateGlobal(
+    "vaderEthPriceAverage",
+    '',
+    _timestamp,
+    uniswapTwap.getVaderEthPriceAverage()
+      .minus(BigInt.fromString(vaderEthPriceAverage.value))
+  );
+
+  let vaderEthSpotPrice = getOrCreateGlobal(
+    "vaderEthSpotPrice",
+    _timestamp
+  );
+  createOrUpdateGlobal(
+    "vaderEthSpotPrice",
+    '',
+    _timestamp,
+    uniswapTwap.getVaderEthSpotPrice()
+      .minus(BigInt.fromString(vaderEthSpotPrice.value))
   );
 }
 

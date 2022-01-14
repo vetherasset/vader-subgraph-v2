@@ -494,6 +494,11 @@ dataSources:
       eventHandlers:
         - event: SetOracle(address)
           handler: handleSetOracle
+      callHandlers:
+        - function: getVaderPrice()
+          handler: handleGetVaderPrice
+        - function: syncVaderPrice()
+          handler: handleSyncVaderPrice
       file: ./src/mappings/uniswapTwap.ts
 
   # ==================== GovernorAlpha ====================

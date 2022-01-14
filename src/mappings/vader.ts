@@ -34,6 +34,7 @@ import {
   getOrCreateBalance,
   UNISWAP_TWAP,
   UNISWAP_TWAP_BLOCKNUMBER,
+  updateVaderPrices,
 } from "./common";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { UniswapTwap } from "../../generated/UniswapTwap/UniswapTwap";
@@ -104,54 +105,7 @@ export function handleTransferEvent(
 
   // Uniswap Twap
   if (_event.block.number.gt(UNISWAP_TWAP_BLOCKNUMBER)) {
-    let uniswapTwap = UniswapTwap.bind(Address.fromString(UNISWAP_TWAP));
-    let staleVaderPrice = getOrCreateGlobal(
-      "staleVaderPrice",
-      _event.block.timestamp
-    );
-    createOrUpdateGlobal(
-      "staleVaderPrice",
-      '',
-      _event.block.timestamp,
-      uniswapTwap.getStaleVaderPrice()
-        .minus(BigInt.fromString(staleVaderPrice.value))
-    );
-
-    let chainlinkPrice = getOrCreateGlobal(
-      "chainlinkPrice",
-      _event.block.timestamp
-    );
-    createOrUpdateGlobal(
-      "chainlinkPrice",
-      '',
-      _event.block.timestamp,
-      uniswapTwap.getChainlinkPrice()
-        .minus(BigInt.fromString(chainlinkPrice.value))
-    );
-
-    let vaderEthPriceAverage = getOrCreateGlobal(
-      "vaderEthPriceAverage",
-      _event.block.timestamp
-    );
-    createOrUpdateGlobal(
-      "vaderEthPriceAverage",
-      '',
-      _event.block.timestamp,
-      uniswapTwap.getVaderEthPriceAverage()
-        .minus(BigInt.fromString(vaderEthPriceAverage.value))
-    );
-
-    let vaderEthSpotPrice = getOrCreateGlobal(
-      "vaderEthSpotPrice",
-      _event.block.timestamp
-    );
-    createOrUpdateGlobal(
-      "vaderEthSpotPrice",
-      '',
-      _event.block.timestamp,
-      uniswapTwap.getVaderEthSpotPrice()
-        .minus(BigInt.fromString(vaderEthSpotPrice.value))
-    );
+    updateVaderPrices(_event.block.number);
   }
 }
 
