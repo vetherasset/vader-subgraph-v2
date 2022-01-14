@@ -114,6 +114,8 @@ type Account @entity {
   swapSenderEvent: [SwapEvent]! @derivedFrom(field: "sender")
   swapToEvent: [SwapEvent]! @derivedFrom(field: "to")
   vestedEvent: [VestedEvent]! @derivedFrom(field: "from")
+  validateEvent: [ValidateEvent]! @derivedFrom(field: "account")
+  inValidateEvent: [InValidateEvent]! @derivedFrom(field: "account")
 }
 
 # ======================== Token ========================
@@ -506,6 +508,19 @@ type VestingCreatedEvent @entity {
 type VestingInitializedEvent @entity {
   id: ID!
   duration: BigInt!
+  timestamp: Int
+}
+
+# ================== UnlockValidator =====================
+type InValidateEvent @entity {
+  id: ID!
+  account: Account!
+  timestamp: Int
+}
+
+type ValidateEvent @entity {
+  id: ID!
+  account: Account!
   timestamp: Int
 }
 

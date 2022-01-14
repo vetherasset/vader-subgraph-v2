@@ -448,6 +448,30 @@ dataSources:
           handler: handleVestingInitializedEvent
       file: ./src/mappings/linearVesting.ts
 
+  # ==================== UnlockValidator ====================
+  - kind: ethereum/contract
+    name: UnlockValidator
+    network: kovan
+    source:
+      address: "0xb2a110fE104bbD0Cf63777234080d9B33a60b935"
+      abi: UnlockValidator
+      startBlock: 29238153
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+      abis:
+        - name: UnlockValidator
+          file: ./abis/UnlockValidator.json
+      eventHandlers:
+        - event: InValidate(address)
+          handler: handleInValidateEvent
+        - event: Validate(address)
+          handler: handleValidateEvent
+      file: ./src/mappings/unlockValidator.ts
+
   # ==================== GovernorAlpha ====================
   - kind: ethereum/contract
     name: GovernorAlpha
