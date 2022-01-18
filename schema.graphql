@@ -117,6 +117,7 @@ type Account @entity {
   validateEvent: [ValidateEvent]! @derivedFrom(field: "account")
   inValidateEvent: [InValidateEvent]! @derivedFrom(field: "account")
   setOracleEvent: [SetOracleEvent]! @derivedFrom(field: "oracle")
+  whitelistPartnerEvent: [WhitelistPartnerEvent]! @derivedFrom(field: "partner")
 }
 
 # ======================== Token ========================
@@ -529,6 +530,55 @@ type ValidateEvent @entity {
 type SetOracleEvent @entity {
   id: ID!
   oracle: Account!
+  timestamp: Int
+}
+
+# ============== VaderMinterUpgradeable ==================
+type PublicMintCapChangedEvent @entity {
+  id: ID!
+  previousPublicMintCap: BigInt!
+  publicMintCap: BigInt!
+  timestamp: Int
+}
+
+type PublicMintFeeChangedEvent @entity {
+  id: ID!
+  previousPublicMintFee: BigInt!
+  publicMintFee: BigInt!
+  timestamp: Int
+}
+
+type PartnerMintCapChangedEvent @entity {
+  id: ID!
+  previousPartnerMintCap: BigInt!
+  partnerMintCap: BigInt!
+  timestamp: Int
+}
+
+type PartnerMintFeeChangedEvent @entity {
+  id: ID!
+  previousPartnercMintFee: BigInt!
+  partnerMintFee: BigInt!
+  timestamp: Int
+}
+
+type DailyLimitsChangedEvent @entity {
+  id: ID!
+  previousFee: BigInt!
+  previousMintLimit: BigInt!
+  previousBurnLimit: BigInt!
+  nextFee: BigInt!
+  nextMintLimit: BigInt!
+  nextBurnLimit: BigInt!
+  timestamp: Int
+}
+
+type WhitelistPartnerEvent @entity {
+  id: ID!
+  partner: Account!
+  mintLimit: BigInt!
+  burnLimit: BigInt!
+  fee: BigInt!
   timestamp: Int
 }
 

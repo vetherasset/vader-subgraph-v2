@@ -493,13 +493,45 @@ dataSources:
           file: ./abis/UniswapTwap.json
       eventHandlers:
         - event: SetOracle(address)
-          handler: handleSetOracle
+          handler: handleSetOracleEvent
       callHandlers:
         - function: getVaderPrice()
           handler: handleGetVaderPrice
         - function: syncVaderPrice()
           handler: handleSyncVaderPrice
       file: ./src/mappings/uniswapTwap.ts
+
+  # =============== VaderMinterUpgradeable ================
+  - kind: ethereum/contract
+    name: VaderMinterUpgradeable
+    network: kovan
+    source:
+      address: "0x17c7309d59514A18Fa623fb0371256a976E5DCE7"
+      abi: VaderMinterUpgradeable
+      startBlock: 29225690
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Global
+      abis:
+        - name: VaderMinterUpgradeable
+          file: ./abis/VaderMinterUpgradeable.json
+      eventHandlers:
+        - event: PublicMintCapChanged(uint256,uint256)
+          handler: handlePublicMintCapChangedEvent
+        - event: PublicMintFeeChanged(uint256,uint256)
+          handler: handlePublicMintFeeChangedEvent
+        - event: PartnerMintCapChanged(uint256,uint256)
+          handler: handlePartnerMintCapChangedEvent
+        - event: PartnerMintFeeChanged(uint256,uint256)
+          handler: handlePartnerMintFeeChangedEvent
+        - event: DailyLimitsChanged((uint256,uint256,uint256),(uint256,uint256,uint256))
+          handler: handleDailyLimitsChangedEvent
+        - event: WhitelistPartner(address,uint256,uint256,uint256)
+          handler: handleWhitelistPartnerEvent
+      file: ./src/mappings/vaderMinterUpgradeable.ts
 
   # ==================== GovernorAlpha ====================
   - kind: ethereum/contract
