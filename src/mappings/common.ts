@@ -7,6 +7,7 @@ import {
   Account,
   Token,
   PairInfo,
+  PartnerLimit,
   Position,
   Proposal,
   Receipt,
@@ -364,6 +365,24 @@ export function getOrCreateLock(
   }
 
   return lock as Lock;
+}
+
+export function getOrCreatePartnerLimit(
+  _address: string
+): PartnerLimit {
+  let partnerLimit = PartnerLimit.load(_address);
+  let account = getOrCreateAccount(_address);
+
+  if (!partnerLimit) {
+    partnerLimit = new PartnerLimit(_address);
+    partnerLimit.partner = account.id;
+    partnerLimit.fee = ZERO;
+    partnerLimit.mintLimit = ZERO;
+    partnerLimit.burnLimit = ZERO;
+    partnerLimit.save();
+  }
+
+  return partnerLimit as PartnerLimit;
 }
 
 export function createOrUpdateAllowance(

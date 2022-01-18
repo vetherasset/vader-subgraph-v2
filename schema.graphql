@@ -64,6 +64,7 @@ type Account @entity {
   nftAllowance: [NFTAllowance]! @derivedFrom(field: "owner")
   vest: [Vest]! @derivedFrom(field: "account")
   lock: [Lock]! @derivedFrom(field: "user")
+  partnerLimit: [PartnerLimit]! @derivedFrom(field: "partner")
   bondInfo: [BondInfo]! @derivedFrom(field: "bond")
   bondDepositorInfo: [BondInfo]! @derivedFrom(field: "depositor")
   bondTerm: [Term]! @derivedFrom(field: "bond")
@@ -534,6 +535,14 @@ type SetOracleEvent @entity {
 }
 
 # ============== VaderMinterUpgradeable ==================
+type PartnerLimit @entity {
+  id: ID!
+  partner: Account!
+  fee: BigInt!
+  mintLimit: BigInt!
+  burnLimit: BigInt!
+}
+
 type PublicMintCapChangedEvent @entity {
   id: ID!
   previousPublicMintCap: BigInt!

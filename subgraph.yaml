@@ -531,6 +531,21 @@ dataSources:
           handler: handleDailyLimitsChangedEvent
         - event: WhitelistPartner(address,uint256,uint256,uint256)
           handler: handleWhitelistPartnerEvent
+      callHandlers:
+        - function: initialize()
+          handler: handleInitialize
+        - function: mint(uint256,uint256)
+          handler: handleMint
+        - function: burn(uint256,uint256)
+          handler: handleBurn
+        - function: partnerMint(uint256)
+          handler: handlePartnerMint
+        - function: partnerBurn(uint256)
+          handler: handlePartnerBurn
+        - function: setTransmuterAddress(address)
+          handler: handleSetTransmuterAddress
+        - function: setLBT(address)
+          handler: handleSetLBT
       file: ./src/mappings/vaderMinterUpgradeable.ts
 
   # ==================== GovernorAlpha ====================
