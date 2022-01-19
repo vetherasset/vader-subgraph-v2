@@ -11,7 +11,8 @@ import {
   PartnerMintCall,
   PartnerBurnCall,
   SetTransmuterAddressCall,
-  SetLBTCall
+  SetLBTCall,
+  VaderMinterUpgradeable
 } from "../../generated/vaderMinterUpgradeable/vaderMinterUpgradeable";
 import {
   PublicMintCapChangedEvent,
@@ -28,7 +29,26 @@ import {
   getOrCreateGlobal,
   getOrCreatePartnerLimit
 } from "./common";
-import { BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+
+function updatePublicFee(
+  _address: Address,
+  _timestamp: BigInt
+): void {
+  let contract = VaderMinterUpgradeable.bind(_address);
+  let currentPublicFee = contract.getPublicFee();
+  let publicFee = getOrCreateGlobal(
+    "publicFee",
+    _timestamp
+  );
+  createOrUpdateGlobal(
+    "publicFee",
+    currentPublicFee.toString(),
+    _timestamp,
+    currentPublicFee.minus(BigInt.fromString(publicFee.value)),
+    true
+  );
+}
 
 export function handleInitialize(
   _call: InitializeCall
@@ -36,6 +56,11 @@ export function handleInitialize(
   createOrUpdateGlobal(
     "cycleTimestamp",
     _call.block.timestamp.toString()
+  );
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
   );
 }
 
@@ -75,6 +100,11 @@ export function handleMint(
       true
     );
   }
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
+  );
 }
 
 export function handleBurn(
@@ -113,6 +143,11 @@ export function handleBurn(
       true
     );
   }
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
+  );
 }
 
 export function handlePartnerMint(
@@ -125,6 +160,11 @@ export function handlePartnerMint(
   let partnerLimit = getOrCreatePartnerLimit(account.id);
   partnerLimit.mintLimit = partnerLimit.mintLimit.minus(_call.outputs.uAmount);
   partnerLimit.save();
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
+  );
 }
 
 export function handlePartnerBurn(
@@ -137,6 +177,11 @@ export function handlePartnerBurn(
   let partnerLimit = getOrCreatePartnerLimit(account.id);
   partnerLimit.burnLimit = partnerLimit.burnLimit.minus(_call.outputs.vAmount);
   partnerLimit.save();
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
+  );
 }
 
 export function handleSetTransmuterAddress(
@@ -145,6 +190,11 @@ export function handleSetTransmuterAddress(
   createOrUpdateGlobal(
     "transmuter",
     _call.inputs._transmuter.toHexString()
+  );
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
   );
 }
 
@@ -155,12 +205,22 @@ export function handleSetLBT(
     "lbt",
     _call.inputs._lbt.toHexString()
   );
+
+  updatePublicFee(
+    _call.to,
+    _call.block.timestamp
+  );
 }
 
 
 export function handlePublicMintCapChangedEvent(
   _event: PublicMintCapChanged
 ): void {
+  updatePublicFee(
+    _event.address,
+    _event.block.timestamp
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new PublicMintCapChangedEvent(eventId);
   event.previousPublicMintCap = _event.params.previousPublicMintCap;
@@ -172,6 +232,11 @@ export function handlePublicMintCapChangedEvent(
 export function handlePublicMintFeeChangedEvent(
   _event: PublicMintFeeChanged
 ): void {
+  updatePublicFee(
+    _event.address,
+    _event.block.timestamp
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new PublicMintFeeChangedEvent(eventId);
   event.previousPublicMintFee = _event.params.previousPublicMintFee;
@@ -183,6 +248,11 @@ export function handlePublicMintFeeChangedEvent(
 export function handlePartnerMintCapChangedEvent(
   _event: PartnerMintCapChanged
 ): void {
+  updatePublicFee(
+    _event.address,
+    _event.block.timestamp
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new PartnerMintCapChangedEvent(eventId);
   event.previousPartnerMintCap = _event.params.previousPartnerMintCap;
@@ -194,6 +264,11 @@ export function handlePartnerMintCapChangedEvent(
 export function handlePartnerMintFeeChangedEvent(
   _event: PartnerMintFeeChanged
 ): void {
+  updatePublicFee(
+    _event.address,
+    _event.block.timestamp
+  );
+
   let eventId = _event.transaction.hash.toHexString();
   let event = new PartnerMintFeeChangedEvent(eventId);
   event.previousPartnercMintFee = _event.params.previousPartnercMintFee;
@@ -205,6 +280,11 @@ export function handlePartnerMintFeeChangedEvent(
 export function handleDailyLimitsChangedEvent(
   _event: DailyLimitsChanged
 ): void {
+  updatePublicFee(
+    _event.address,
+    _event.block.timestamp
+  );
+
   createOrUpdateGlobal(
     "dailyLimits_fee",
     _event.params.previousLimits.fee.toString(),
@@ -248,6 +328,11 @@ export function handleDailyLimitsChangedEvent(
 export function handleWhitelistPartnerEvent(
   _event: WhitelistPartner
 ): void {
+  updatePublicFee(
+    _event.address,
+    _event.block.timestamp
+  );
+
   let account = getOrCreateAccount(
     _event.params.partner.toHexString(),
     _event.block.timestamp
