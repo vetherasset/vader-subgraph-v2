@@ -13,9 +13,9 @@ dataSources:
     name: Vader
     network: kovan
     source:
-      address: "0xB46dbd07ce34813623FB0643b21DCC8D0268107D"
+      address: "0xcCb3AeF7Baa506e2D05193e38e88459F68AC1a8F"
       abi: Vader
-      startBlock: 28758458
+      startBlock: 28501309
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -54,9 +54,9 @@ dataSources:
     name: USDV
     network: kovan
     source:
-      address: "0x0de905dfb036521f5A45Da90B2D9e8a74a9CE42E"
+      address: "0xF5783253A21E5E740908CEdB800183b70A004479"
       abi: USDV
-      startBlock: 29237977
+      startBlock: 29354810
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -506,9 +506,9 @@ dataSources:
     name: VaderMinterUpgradeable
     network: kovan
     source:
-      address: "0x17c7309d59514A18Fa623fb0371256a976E5DCE7"
+      address: "0xBeF6975EdB6485965e49eaad5505aFD6b11b5958"
       abi: VaderMinterUpgradeable
-      startBlock: 29225690
+      startBlock: 29354990
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
